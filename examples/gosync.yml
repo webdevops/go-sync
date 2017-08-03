@@ -1,0 +1,32 @@
+---
+
+sync:
+  production: &production
+    localPath: ./test/
+    foobar: ./test/
+
+    connection:
+      type: ssh
+      hostname: remote
+      user: user
+      password: password
+
+    filesystem:
+      - path:
+        exclude:
+
+    databases:
+      - type: mysql
+        database: typo3
+        username: root
+        password: dev
+        filter:
+          exclude:
+            <<: *databaseExcludeTYPO3
+          include:
+
+deploy:
+  production:
+    <<: *production
+    connection:
+      type: docker
