@@ -7,17 +7,17 @@ import (
 )
 
 // General sync
-func (filesystem *filesystem) Sync(server *server) {
+func (filesystem *filesystem) Deploy(server *server) {
 	switch server.Connection.GetType() {
 	case "ssh":
-		filesystem.syncRsync(server)
+		filesystem.deployRsync(server)
 	case "docker":
 		errors.New("Docker not supported")
 	}
 }
 
 // Sync filesystem using rsync
-func (filesystem *filesystem) syncRsync(server *server) {
+func (filesystem *filesystem) deployRsync(server *server) {
 	args := []string{"-rlptD", "--delete-after", "--progress", "--human-readable"}
 
 	// include filter
@@ -39,8 +39,8 @@ func (filesystem *filesystem) syncRsync(server *server) {
 	}
 
 	// build source and target paths
-	sourcePath := fmt.Sprintf("%s:%s", server.Connection.SshConnectionHostnameString(), filesystem.Path)
-	targetPath := filesystem.localPath(server)
+	sourcePath := filesystem.localPath(server)
+	targetPath := fmt.Sprintf("%s:%s", server.Connection.SshConnectionHostnameString(), filesystem.Path)
 
 	// make sure source/target paths are using suffix slash
 	args = append(args, RsyncPath(sourcePath), RsyncPath(targetPath))

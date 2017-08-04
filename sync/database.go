@@ -181,27 +181,38 @@ func (database *database) mysqlTableList() []string {
 	return ret
 }
 
-func (database *database) String() string {
-	var parts []string
+func (database *database) String(direction string) string {
+	var parts, remote, local []string
 
-	parts = append(parts, fmt.Sprintf("Schema:%s", database.Schema))
+	// remote
+	remote = append(remote, fmt.Sprintf("Schema:%s", database.Schema))
 
 	if database.Hostname != "" {
-		parts = append(parts, fmt.Sprintf("Host:%s", database.Hostname))
+		remote = append(remote, fmt.Sprintf("Host:%s", database.Hostname))
 	}
 
 	if database.User != "" {
-		parts = append(parts, fmt.Sprintf("User:%s", database.User))
+		remote = append(remote, fmt.Sprintf("User:%s", database.User))
 	}
 
 	if database.Password != "" {
-		parts = append(parts, fmt.Sprintf("Passwd:%s", "*****"))
+		remote = append(remote, fmt.Sprintf("Passwd:%s", "*****"))
 	}
 
-	parts = append(parts, "->")
+	// local
+	local = append(local, fmt.Sprintf("Schema:%s", database.Local.Schema))
 
-	parts = append(parts, fmt.Sprintf("Schema:%s", database.Local.Schema))
-
+	// build parts
+	switch direction {
+	case "sync":
+		parts = append(parts, remote...)
+		parts = append(parts, "->")
+		parts = append(parts, local...)
+	case "deploy":
+		parts = append(parts, local...)
+		parts = append(parts, "->")
+		parts = append(parts, remote...)
+	}
 
 	return fmt.Sprintf("Database[%s]", strings.Join(parts[:]," "))
 }

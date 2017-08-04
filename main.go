@@ -144,13 +144,12 @@ func main() {
 		Logger.Step("using %s server", opts.Positional.Server)
 		confServer.Sync()
 	case "deploy":
-		Logger.FatalExit(1, "Deploy not supported at this moment")
 		confServer, err := config.GetDeployServer(opts.Positional.Server)
 		if err != nil {
 			Logger.FatalErrorExit(3, err)
 		}
 		Logger.Step("using %s server", opts.Positional.Server)
-		confServer.Sync()
+		confServer.Deploy()
 	}
 
 	Logger.Println("-> finished")
