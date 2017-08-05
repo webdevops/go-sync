@@ -26,12 +26,12 @@ func (database *database) syncClearDatabase(server *server) {
 
 	Logger.Step("dropping local database \"%s\"", schema)
 	dropStmt := fmt.Sprintf("DROP DATABASE IF EXISTS %s", schema)
-	dropCmd := shell.Cmd("echo", dropStmt).Pipe(database.mysqlCmdBuilderLocal()...)
+	dropCmd := shell.Cmd("echo", dropStmt).Pipe(database.localMysqlCmdBuilder()...)
 	dropCmd.Run()
 
 	Logger.Step("creating local database \"%s\"", schema)
 	createStmt := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS  %s", schema)
-	createCmd := shell.Cmd("echo", createStmt).Pipe(database.mysqlCmdBuilderLocal()...)
+	createCmd := shell.Cmd("echo", createStmt).Pipe(database.localMysqlCmdBuilder()...)
 	createCmd.Run()
 
 	database.Local.Schema = schema
@@ -43,7 +43,7 @@ func (database *database) syncStructure(server *server) {
 
 	// Sync structure only
 	dumpCmd := database.remoteSshDump([]string{"--no-data"}, false)
-	restoreCmd := database.mysqlCmdBuilderLocal()
+	restoreCmd := database.localMysqlCmdBuilder()
 
 	cmd := shell.Cmd(dumpCmd...).Pipe("gunzip", "--stdout").Pipe(restoreCmd...)
 	cmd.Run()
@@ -55,7 +55,7 @@ func (database *database) syncData(server *server) {
 
 	// Sync data only
 	dumpCmd := database.remoteSshDump([]string{"--no-create-info"}, true)
-	restoreCmd := database.mysqlCmdBuilderLocal()
+	restoreCmd := database.localMysqlCmdBuilder()
 
 	cmd := shell.Cmd(dumpCmd...).Pipe("gunzip", "--stdout").Pipe(restoreCmd...)
 	cmd.Run()
