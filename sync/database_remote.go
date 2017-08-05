@@ -4,6 +4,7 @@ import (
 	"strings"
 	"github.com/webdevops/go-shell"
 )
+
 func (database *database) remoteSshDump(additionalArgs []string, useFilter bool) []interface{} {
 	var args []string
 
@@ -28,7 +29,7 @@ func (database *database) remoteSshDump(additionalArgs []string, useFilter bool)
 	}
 
 	// exclude
-	excludeArgs, includeArgs := database.mysqlTableFilter(&database.remoteConnection, "dump");
+	excludeArgs, includeArgs := database.mysqlTableFilter(&database.remoteConnection, "remote");
 	if useFilter && len(excludeArgs) > 0 {
 		args = append(args, excludeArgs...)
 	}
@@ -63,7 +64,9 @@ func (database *database) remoteMysqlCmdBuilder(args ...string) []interface{} {
 		args = append(args, "-P" + database.Port)
 	}
 
-	args = append(args, database.Schema)
+	if database.Schema != "" {
+		args = append(args, database.Schema)
+	}
 
 	return database.remoteConnection.RemoteCommandBuilder("mysql", args...)
 }

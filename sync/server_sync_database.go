@@ -21,17 +21,17 @@ func (database *database) syncClearDatabase(server *server) {
 
 	// don't use database which we're trying to drop, instead use "mysql"
 	schema := database.Local.Schema
-	database.Local.Schema = "mysql"
+	database.Local.Schema = ""
 
 
 	Logger.Step("dropping local database \"%s\"", schema)
-	dropStmt := fmt.Sprintf("DROP DATABASE IF EXISTS %s", schema)
-	dropCmd := shell.Cmd("echo", dropStmt).Pipe(database.localMysqlCmdBuilder()...)
+	dropStmt := fmt.Sprintf("DROP DATABASE IF EXISTS `%s`", schema)
+	dropCmd := shell.Cmd("echo", shell.Quote(dropStmt)).Pipe(database.localMysqlCmdBuilder()...)
 	dropCmd.Run()
 
 	Logger.Step("creating local database \"%s\"", schema)
-	createStmt := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS  %s", schema)
-	createCmd := shell.Cmd("echo", createStmt).Pipe(database.localMysqlCmdBuilder()...)
+	createStmt := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", schema)
+	createCmd := shell.Cmd("echo", shell.Quote(createStmt)).Pipe(database.localMysqlCmdBuilder()...)
 	createCmd.Run()
 
 	database.Local.Schema = schema

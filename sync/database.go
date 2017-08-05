@@ -32,20 +32,19 @@ type database struct {
 	remoteConnection connection
 }
 
-func (database *database) mysqlTableFilter(connection *connection, direction string) ([]string, []string) {
+func (database *database) mysqlTableFilter(connection *connection, connectionType string) ([]string, []string) {
 	var exclude []string
 	var include []string
 
 	var tableList []string
 
-	if (direction == "sync") {
+	if (connectionType == "local") {
 		if len(database.cacheLocalTableList) == 0 {
 			Logger.Step("get list of mysql tables for table filter")
 			database.cacheLocalTableList = database.localMysqlTableList()
 		}
 
-		tableList = database.cacheRemoteTableList
-
+		tableList = database.cacheLocalTableList
 	} else {
 		if len(database.cacheRemoteTableList) == 0 {
 			Logger.Step("get list of mysql tables for table filter")

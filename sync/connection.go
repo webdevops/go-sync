@@ -99,9 +99,22 @@ func (connection *connection) SshConnectionHostnameString() string {
 func (connection *connection) GetType() string {
 	var connType string
 
+	// autodetection
+	if connection.Type == "" {
+		connection.Type = "local"
+
+		if connection.Docker != "" {
+			connection.Type = "docker"
+		}
+
+		if connection.Hostname != "" {
+			connection.Type = "ssh"
+		}
+	}
+
 	switch connection.Type {
-	case "":
-		fallthrough
+	case "local":
+		connType = "local"
 	case "ssh":
 		connType = "ssh"
 	case "docker":
