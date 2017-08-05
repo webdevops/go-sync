@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"log"
 	"fmt"
 	"path"
 	"strings"
@@ -9,7 +10,6 @@ import (
 	"github.com/webdevops/go-shell"
 	"./sync"
 	"./logger"
-	"log"
 )
 
 const (
@@ -26,7 +26,7 @@ var (
 
 var opts struct {
 	Positional struct {
-		Command string `description:"sync, deploy or show" choice:"show" choice:"sync" choice:"deploy" required:"1"`
+		Command string `description:"What to do [help, sync, deploy or show]" choice:"show" choice:"sync" choice:"deploy" choice:"hjelp" required:"1"`
 		Server  string `description:"server configuration key"`
 	} `positional-args:"true"`
 
@@ -109,6 +109,8 @@ func findConfigFile() string {
 func main() {
 	createArgparser()
 
+	argCommand := strings.ToLower(opts.Positional.Command)
+
 	switch {
 	case len(opts.Verbose) >= 2:
 		shell.Trace = true
@@ -124,6 +126,11 @@ func main() {
 		}
 	}
 
+	if argCommand == "help" {
+		argparser.WriteHelp(os.Stdout)
+		os.Exit(0)
+	}
+
 	Logger.Main("Initialisation")
 	configFile := findConfigFile()
 	if configFile == "" {
@@ -135,7 +142,7 @@ func main() {
 	sync.Logger = Logger
 	config := sync.NewConfigParser(configFile)
 
-	switch opts.Positional.Command {
+	switch argCommand {
 	case "show":
 		config.ShowConfiguration()
 	case "sync":
