@@ -42,7 +42,7 @@ func (database *database) syncStructure(server *server) {
 	Logger.Step("syncing database structure")
 
 	// Sync structure only
-	dumpCmd := database.remoteSshDump([]string{"--no-data"}, false)
+	dumpCmd := database.remoteMysqldumpCmdBuilder([]string{"--no-data"}, false)
 	restoreCmd := database.localMysqlCmdBuilder()
 
 	cmd := shell.Cmd(dumpCmd...).Pipe("gunzip", "--stdout").Pipe(restoreCmd...)
@@ -54,7 +54,7 @@ func (database *database) syncData(server *server) {
 	Logger.Step("syncing database data")
 
 	// Sync data only
-	dumpCmd := database.remoteSshDump([]string{"--no-create-info"}, true)
+	dumpCmd := database.remoteMysqldumpCmdBuilder([]string{"--no-create-info"}, true)
 	restoreCmd := database.localMysqlCmdBuilder()
 
 	cmd := shell.Cmd(dumpCmd...).Pipe("gunzip", "--stdout").Pipe(restoreCmd...)

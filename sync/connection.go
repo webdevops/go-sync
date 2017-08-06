@@ -12,7 +12,6 @@ type connection struct {
 	User string
 	Password string
 	Docker string
-	Compression string
 }
 
 func (connection *connection) SshCompressedCommandBuilder(command string, args ...string) []interface{} {

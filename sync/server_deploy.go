@@ -19,7 +19,7 @@ func (server *server) DeployFilesystem() {
 
 func (server *server) DeployDatabases() {
 	for _, database := range server.Database {
-		Logger.Main("Starting sync of %s", database.String("deploy"))
+		Logger.Main("Starting deploy of %s", database.String("deploy"))
 		database.Deploy(server)
 	}
 }

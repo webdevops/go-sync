@@ -1,11 +1,6 @@
 package sync
 
-import (
-	"strings"
-	"github.com/webdevops/go-shell"
-)
-
-func (database *database) localSshDump(additionalArgs []string, useFilter bool) []interface{} {
+func (database *database) localMysqldumpCmdBuilder(additionalArgs []string, useFilter bool) []interface{} {
 	var args []string
 
 	if database.Local.User != "" {
@@ -97,13 +92,3 @@ func (database *database) localMysqlCmdBuilder(args ...string) []interface{} {
 	return database.Local.Connection.RemoteCommandBuilder("mysql", args...)
 }
 
-func (database *database) localMysqlTableList() []string {
-	sqlStmt := "SHOW TABLES"
-	cmd := shell.Cmd("echo", sqlStmt).Pipe(database.localMysqlCmdBuilder()...)
-	output := cmd.Run().Stdout.String()
-
-	outputString := strings.TrimSpace(string(output))
-	ret := strings.Split(outputString, "\n")
-
-	return ret
-}

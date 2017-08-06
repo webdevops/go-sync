@@ -41,10 +41,10 @@ func (database *database) deployStructure(server *server) {
 	Logger.Step("deploy database structure")
 
 	// Deploy structure only
-	dumpCmd := database.localSshDump([]string{"--no-data"}, false)
-	restoreCmd := database.remoteMysqlCmdBuilder()
+	dumpCmd := database.localMysqldumpCmdBuilder([]string{"--no-data"}, false)
+	restoreCmd := database.remoteMysqlCmdBuilderUncompress()
 
-	cmd := shell.Cmd(dumpCmd...).Pipe(restoreCmd...)
+	cmd := shell.Cmd(dumpCmd...).Pipe("gzip", "--stdout").Pipe(restoreCmd...)
 	cmd.Run()
 }
 
@@ -53,9 +53,9 @@ func (database *database) deployData(server *server) {
 	Logger.Step("deploy database data")
 
 	// Deploy data only
-	dumpCmd := database.localSshDump([]string{"--no-create-info"}, true)
-	restoreCmd := database.remoteMysqlCmdBuilder()
+	dumpCmd := database.localMysqldumpCmdBuilder([]string{"--no-create-info"}, true)
+	restoreCmd := database.remoteMysqlCmdBuilderUncompress()
 
-	cmd := shell.Cmd(dumpCmd...).Pipe(restoreCmd...)
+	cmd := shell.Cmd(dumpCmd...).Pipe("gzip", "--stdout").Pipe(restoreCmd...)
 	cmd.Run()
 }

@@ -3,6 +3,7 @@ package sync
 import (
 	"fmt"
 	"strings"
+	"github.com/webdevops/go-shell"
 )
 
 type database struct {
@@ -12,13 +13,16 @@ type database struct {
 	Port string
 	User string
 	Password string
+
 	Filter filter
 	Local struct {
+		Type string
 		Schema string
 		Hostname string
 		Port string
 		User string
 		Password string
+
 		Connection connection
 	}
 	Options struct {
@@ -41,14 +45,14 @@ func (database *database) mysqlTableFilter(connection *connection, connectionTyp
 	if (connectionType == "local") {
 		if len(database.cacheLocalTableList) == 0 {
 			Logger.Step("get list of mysql tables for table filter")
-			database.cacheLocalTableList = database.localMysqlTableList()
+			database.cacheLocalTableList = database.mysqlTableList(connectionType)
 		}
 
 		tableList = database.cacheLocalTableList
 	} else {
 		if len(database.cacheRemoteTableList) == 0 {
 			Logger.Step("get list of mysql tables for table filter")
-			database.cacheRemoteTableList = database.remoteMysqlTableList()
+			database.cacheRemoteTableList = database.mysqlTableList(connectionType)
 		}
 
 		tableList = database.cacheRemoteTableList
@@ -104,4 +108,32 @@ func (database *database) String(direction string) string {
 	}
 
 	return fmt.Sprintf("Database[%s]", strings.Join(parts[:]," "))
+}
+
+func (database *database) mysqlCommandBuilder(direction string, args ...string) []interface{} {
+	if direction == "local" {
+		return database.localMysqlCmdBuilder(args...)
+	} else {
+		return database.remoteMysqlCmdBuilder(args...)
+	}
+}
+
+func (database *database) mysqldumpCommandBuilder(direction string, args ...string) []interface{} {
+	if direction == "local" {
+		return database.localMysqlCmdBuilder(args...)
+	} else {
+		return database.remoteMysqlCmdBuilder(args...)
+	}
+}
+
+func (database *database) mysqlTableList(connectionType string) []string {
+	sqlStmt := "SHOW TABLES"
+
+	cmd := shell.Cmd("echo", sqlStmt).Pipe(database.mysqlCommandBuilder(connectionType)...)
+	output := cmd.Run().Stdout.String()
+
+	outputString := strings.TrimSpace(string(output))
+	ret := strings.Split(outputString, "\n")
+
+	return ret
 }

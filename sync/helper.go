@@ -37,6 +37,10 @@ func DockerGetContainerId(container string) string {
 		cmd := shell.Cmd("docker-compose", "ps", "-q", containerName).Run()
 		containerId := strings.TrimSpace(cmd.Stdout.String())
 
+		if containerId == "" {
+			panic(fmt.Sprintf("Container \"%s\" not found empty", container))
+		}
+
 		return containerId
 	}
 

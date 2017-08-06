@@ -1,11 +1,11 @@
 package sync
 
 import (
-	"strings"
 	"github.com/webdevops/go-shell"
+	"strings"
 )
 
-func (database *database) remoteSshDump(additionalArgs []string, useFilter bool) []interface{} {
+func (database *database) remoteMysqldumpCmdBuilder(additionalArgs []string, useFilter bool) []interface{} {
 	var args []string
 
 	if database.User != "" {
@@ -71,13 +71,35 @@ func (database *database) remoteMysqlCmdBuilder(args ...string) []interface{} {
 	return database.remoteConnection.RemoteCommandBuilder("mysql", args...)
 }
 
-func (database *database) remoteMysqlTableList() []string {
-	sqlStmt := "SHOW TABLES"
-	cmd := shell.Cmd("echo", sqlStmt).Pipe(database.remoteMysqlCmdBuilder()...)
-	output := cmd.Run().Stdout.String()
 
-	outputString := strings.TrimSpace(string(output))
-	ret := strings.Split(outputString, "\n")
+func (database *database) remoteMysqlCmdBuilderUncompress(args ...string) []interface{} {
+	args = append(args, "-BN")
 
-	return ret
+	if database.User != "" {
+		args = append(args, "-u" + database.User)
+	}
+
+	if database.Password != "" {
+		args = append(args, "-p" + database.Password)
+	}
+
+	if database.Hostname != "" {
+		args = append(args, "-h" + database.Hostname)
+	}
+
+	if database.Port != "" {
+		args = append(args, "-P" + database.Port)
+	}
+
+	if database.Schema != "" {
+		args = append(args, database.Schema)
+	}
+
+	for key, val := range args {
+		args[key] = shell.Quote(val)
+	}
+
+	cmd := []string{"gunzip", "--stdout", "|", "mysql", strings.Join(args, " ")}
+
+	return database.remoteConnection.RemoteCommandBuilder("sh", "-c", shell.Quote(strings.Join(cmd, " ")))
 }
