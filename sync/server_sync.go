@@ -1,6 +1,6 @@
 package sync
 
-func (server *server) Sync() {
+func (server *Server) Sync() {
 	defer func() {
 		recover := recover()
 		ShellErrorHandler(recover)
@@ -10,14 +10,14 @@ func (server *server) Sync() {
 	server.SyncDatabases()
 }
 
-func (server *server) SyncFilesystem() {
+func (server *Server) SyncFilesystem() {
 	for _, filesystem := range server.Filesystem {
 		Logger.Main("Starting sync of %s", filesystem.String(server, "sync"))
 		filesystem.Sync(server)
 	}
 }
 
-func (server *server) SyncDatabases() {
+func (server *Server) SyncDatabases() {
 	for _, database := range server.Database {
 		Logger.Main("Starting sync of %s", database.String("sync"))
 		database.Sync(server)

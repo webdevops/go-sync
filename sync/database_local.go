@@ -1,6 +1,6 @@
 package sync
 
-func (database *database) localMysqldumpCmdBuilder(additionalArgs []string, useFilter bool) []interface{} {
+func (database *Database) localMysqldumpCmdBuilder(additionalArgs []string, useFilter bool) []interface{} {
 	var args []string
 
 	if database.Local.User != "" {
@@ -37,10 +37,10 @@ func (database *database) localMysqldumpCmdBuilder(additionalArgs []string, useF
 		args = append(args, includeArgs...)
 	}
 
-	return database.Local.Connection.RemoteCommandBuilder("mysqldump", args...)
+	return database.Local.Connection.CommandBuilder("mysqldump", args...)
 }
 
-func (database *database) localCommandInterface(command string, args ...string) []interface{} {
+func (database *Database) localCommandInterface(command string, args ...string) []interface{} {
 	var ret []interface{}
 
 	if database.Local.Connection.Type == "" {
@@ -60,13 +60,13 @@ func (database *database) localCommandInterface(command string, args ...string) 
 	case "local":
 		ret = ShellCommandInterfaceBuilder(command, args...)
 	case "ssh":
-		ret = database.Local.Connection.RemoteCommandBuilder(command, args...)
+		ret = database.Local.Connection.CommandBuilder(command, args...)
 	}
 
 	return ret
 }
 
-func (database *database) localMysqlCmdBuilder(args ...string) []interface{} {
+func (database *Database) localMysqlCmdBuilder(args ...string) []interface{} {
 	args = append(args, "-BN")
 
 	if database.Local.User != "" {
@@ -89,6 +89,6 @@ func (database *database) localMysqlCmdBuilder(args ...string) []interface{} {
 		args = append(args, database.Local.Schema)
 	}
 
-	return database.Local.Connection.RemoteCommandBuilder("mysql", args...)
+	return database.Local.Connection.CommandBuilder("mysql", args...)
 }
 

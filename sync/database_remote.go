@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func (database *database) remoteMysqldumpCmdBuilder(additionalArgs []string, useFilter bool) []interface{} {
+func (database *Database) remoteMysqldumpCmdBuilder(additionalArgs []string, useFilter bool) []interface{} {
 	var args []string
 
 	if database.User != "" {
@@ -45,7 +45,7 @@ func (database *database) remoteMysqldumpCmdBuilder(additionalArgs []string, use
 	return database.remoteConnection.SshCompressedCommandBuilder("mysqldump", args...)
 }
 
-func (database *database) remoteMysqlCmdBuilder(args ...string) []interface{} {
+func (database *Database) remoteMysqlCmdBuilder(args ...string) []interface{} {
 	args = append(args, "-BN")
 
 	if database.User != "" {
@@ -68,11 +68,11 @@ func (database *database) remoteMysqlCmdBuilder(args ...string) []interface{} {
 		args = append(args, database.Schema)
 	}
 
-	return database.remoteConnection.RemoteCommandBuilder("mysql", args...)
+	return database.remoteConnection.CommandBuilder("mysql", args...)
 }
 
 
-func (database *database) remoteMysqlCmdBuilderUncompress(args ...string) []interface{} {
+func (database *Database) remoteMysqlCmdBuilderUncompress(args ...string) []interface{} {
 	args = append(args, "-BN")
 
 	if database.User != "" {
@@ -101,5 +101,5 @@ func (database *database) remoteMysqlCmdBuilderUncompress(args ...string) []inte
 
 	cmd := []string{"gunzip", "--stdout", "|", "mysql", strings.Join(args, " ")}
 
-	return database.remoteConnection.RemoteCommandBuilder("sh", "-c", shell.Quote(strings.Join(cmd, " ")))
+	return database.remoteConnection.CommandBuilder("sh", "-c", shell.Quote(strings.Join(cmd, " ")))
 }

@@ -6,37 +6,8 @@ import (
 	"github.com/webdevops/go-shell"
 )
 
-type database struct {
-	Type string
-	Schema string
-	Hostname string
-	Port string
-	User string
-	Password string
 
-	Filter filter
-	Local struct {
-		Type string
-		Schema string
-		Hostname string
-		Port string
-		User string
-		Password string
-
-		Connection connection
-	}
-	Options struct {
-		ClearDatabase bool `yaml:"clear-database"`
-	}
-
-	// local cache
-	cacheRemoteTableList []string
-	cacheLocalTableList []string
-
-	remoteConnection connection
-}
-
-func (database *database) mysqlTableFilter(connection *connection, connectionType string) ([]string, []string) {
+func (database *Database) mysqlTableFilter(connection *Connection, connectionType string) ([]string, []string) {
 	var exclude []string
 	var include []string
 
@@ -74,7 +45,7 @@ func (database *database) mysqlTableFilter(connection *connection, connectionTyp
 	return exclude, include
 }
 
-func (database *database) String(direction string) string {
+func (database *Database) String(direction string) string {
 	var parts, remote, local []string
 
 	// remote
@@ -110,7 +81,7 @@ func (database *database) String(direction string) string {
 	return fmt.Sprintf("Database[%s]", strings.Join(parts[:]," "))
 }
 
-func (database *database) mysqlCommandBuilder(direction string, args ...string) []interface{} {
+func (database *Database) mysqlCommandBuilder(direction string, args ...string) []interface{} {
 	if direction == "local" {
 		return database.localMysqlCmdBuilder(args...)
 	} else {
@@ -118,7 +89,7 @@ func (database *database) mysqlCommandBuilder(direction string, args ...string) 
 	}
 }
 
-func (database *database) mysqldumpCommandBuilder(direction string, args ...string) []interface{} {
+func (database *Database) mysqldumpCommandBuilder(direction string, args ...string) []interface{} {
 	if direction == "local" {
 		return database.localMysqlCmdBuilder(args...)
 	} else {
@@ -126,7 +97,7 @@ func (database *database) mysqldumpCommandBuilder(direction string, args ...stri
 	}
 }
 
-func (database *database) mysqlTableList(connectionType string) []string {
+func (database *Database) mysqlTableList(connectionType string) []string {
 	sqlStmt := "SHOW TABLES"
 
 	cmd := shell.Cmd("echo", sqlStmt).Pipe(database.mysqlCommandBuilder(connectionType)...)

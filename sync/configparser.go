@@ -24,10 +24,7 @@ databaseExcludeTYPO3:
 ---
 `
 
-type SyncConfig struct {
-	Sync map[string]server
-	Deploy map[string]server
-}
+
 
 func NewConfigParser(file string) *SyncConfig {
 	config := SyncConfig{}
@@ -47,19 +44,19 @@ func NewConfigParser(file string) *SyncConfig {
 	return &config
 }
 
-func (config *SyncConfig) GetSyncServer(serverName string) (server, error) {
+func (config *SyncConfig) GetSyncServer(serverName string) (Server, error) {
 	if val, ok := config.Sync[serverName]; ok {
 		return val, nil
 	} else {
-		return server{}, errors.New(fmt.Sprintf("Server name %s doesn't exists", serverName))
+		return Server{}, errors.New(fmt.Sprintf("Server name %s doesn't exists", serverName))
 	}
 }
 
-func (config *SyncConfig) GetDeployServer(serverName string) (server, error) {
+func (config *SyncConfig) GetDeployServer(serverName string) (Server, error) {
 	if val, ok := config.Deploy[serverName]; ok {
 		return val, nil
 	} else {
-		return server{}, errors.New(fmt.Sprintf("Server name %s doesn't exists", serverName))
+		return Server{}, errors.New(fmt.Sprintf("Server name %s doesn't exists", serverName))
 	}
 }
 

@@ -1,112 +1,36 @@
 package sync
 
-import (
-	"fmt"
-	"github.com/webdevops/go-shell"
-	"strings"
-)
-
-type connection struct {
-	Type string
-	Hostname string
-	User string
-	Password string
-	Docker string
-}
-
-func (connection *connection) SshCompressedCommandBuilder(command string, args ...string) []interface{} {
-	originalCmd := []string{
-		shell.Quote(command),
-	}
-
-	for _, val := range args {
-		originalCmd = append(originalCmd, shell.Quote(val))
-	}
-
-	inlineCommand := fmt.Sprintf("%s | gzip --stdout", strings.Join(originalCmd, " "))
-
-	return connection.sshCommandBuilder(inlineCommand)
-}
-
-func (connection *connection) RemoteCommandBuilder(command string, args ...string) []interface{} {
+func (connection *Connection) CommandBuilder(command string, args ...string) []interface{} {
 	var ret []interface{}
-
-	if connection.Type == "" {
-		connection.Type = "local"
-
-		// autodetection
-		if connection.Docker != "" {
-			connection.Type = "docker"
-		}
-
-		if connection.Hostname != "" {
-			connection.Type = "ssh"
-		}
-	}
 
 	switch connection.GetType() {
 	case "local":
-		ret = ShellCommandInterfaceBuilder(command, args...)
+		ret = connection.LocalCommandBuilder(command, args...)
 	case "ssh":
-		ret = connection.sshCommandBuilder(command, args...)
+		ret = connection.SshCommandBuilder(command, args...)
+	case "ssh+docker":
+		fallthrough
 	case "docker":
-		ret = connection.dockerCommandBuilder(command, args...)
+		ret = connection.DockerCommandBuilder(command, args...)
+	default:
+		panic(connection)
 	}
 
 	return ret
 }
 
-func (connection *connection) sshCommandBuilder(command string, args ...string) []interface{} {
-	sshArgs := []string{
-		"-oBatchMode=yes",
-		"-oPasswordAuthentication=no",
-		connection.SshConnectionHostnameString(),
-		"--",
-		command,
-	}
-
-	for _, val := range args {
-		sshArgs = append(sshArgs, val)
-	}
-
-	return ShellCommandInterfaceBuilder("ssh", sshArgs...)
-}
-
-func (connection *connection) dockerCommandBuilder(cmd string, args ...string) []interface{} {
-	dockerArgs := []string{
-		"exec",
-		"-i",
-		DockerGetContainerId(connection.Docker),
-		cmd,
-	}
-
-	for _, val := range args {
-		dockerArgs = append(dockerArgs, val)
-	}
-
-	return ShellCommandInterfaceBuilder("docker", dockerArgs...)
-}
-
-func (connection *connection) SshConnectionHostnameString() string {
-	if connection.User != "" {
-		return fmt.Sprintf("%s@%s", connection.User, connection.Hostname)
-	} else {
-		return connection.Hostname
-	}
-}
-
-func (connection *connection) GetType() string {
+func (connection *Connection) GetType() string {
 	var connType string
 
 	// autodetection
-	if connection.Type == "" {
+	if (connection.Type == "") || (connection.Type == "auto") {
 		connection.Type = "local"
 
-		if connection.Docker != "" {
+		if (connection.Docker != "") && connection.Hostname != "" {
+			connection.Type = "ssh+docker"
+		} else if connection.Docker != "" {
 			connection.Type = "docker"
-		}
-
-		if connection.Hostname != "" {
+		} else if connection.Hostname != "" {
 			connection.Type = "ssh"
 		}
 	}
@@ -118,6 +42,8 @@ func (connection *connection) GetType() string {
 		connType = "ssh"
 	case "docker":
 		connType = "docker"
+	case "ssh+docker":
+		connType = "ssh+docker"
 	default:
 		Logger.FatalExit(1, "Unknown connection type \"%s\"", connType)
 	}

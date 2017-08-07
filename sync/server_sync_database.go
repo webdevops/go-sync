@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func (database *database) Sync(server *server) {
+func (database *Database) Sync(server *Server) {
 	database.remoteConnection = server.Connection
 
 	if database.Options.ClearDatabase {
@@ -17,7 +17,7 @@ func (database *database) Sync(server *server) {
 }
 
 // Sync database structure
-func (database *database) syncClearDatabase(server *server) {
+func (database *Database) syncClearDatabase(server *Server) {
 
 	// don't use database which we're trying to drop, instead use "mysql"
 	schema := database.Local.Schema
@@ -38,7 +38,7 @@ func (database *database) syncClearDatabase(server *server) {
 }
 
 // Sync database structure
-func (database *database) syncStructure(server *server) {
+func (database *Database) syncStructure(server *Server) {
 	Logger.Step("syncing database structure")
 
 	// Sync structure only
@@ -50,7 +50,7 @@ func (database *database) syncStructure(server *server) {
 }
 
 // Sync database data
-func (database *database) syncData(server *server) {
+func (database *Database) syncData(server *Server) {
 	Logger.Step("syncing database data")
 
 	// Sync data only

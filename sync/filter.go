@@ -4,14 +4,7 @@ import (
 	"regexp"
 )
 
-type filter struct {
-	Exclude []string
-	excludeRegexp []*regexp.Regexp
-	Include []string
-	includeRegexp []*regexp.Regexp
-}
-
-func (filter *filter) compile() {
+func (filter *Filter) compile() {
 	if len(filter.excludeRegexp) == 0 {
 		filter.excludeRegexp = make([]*regexp.Regexp, len(filter.Exclude))
 		for i, filterVal := range filter.Exclude {
@@ -27,17 +20,17 @@ func (filter *filter) compile() {
 	}
 }
 
-func (filter *filter) CalcExcludes(lines []string) []string {
+func (filter *Filter) CalcExcludes(lines []string) []string {
 	filter.compile()
 	return filter.calculateMatching(filter.excludeRegexp, lines)
 }
 
-func (filter *filter) CalcIncludes(lines []string) []string {
+func (filter *Filter) CalcIncludes(lines []string) []string {
 	filter.compile()
 	return filter.calculateMatching(filter.includeRegexp, lines)
 }
 
-func (filter *filter) calculateMatching(regexpList []*regexp.Regexp, lines []string) []string {
+func (filter *Filter) calculateMatching(regexpList []*regexp.Regexp, lines []string) []string {
 	var ret []string
 
 	for _, filterRegexp := range regexpList {

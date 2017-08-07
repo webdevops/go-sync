@@ -5,13 +5,7 @@ import (
 	"strings"
 )
 
-type filesystem struct {
-	Path string
-	Local string
-	Filter filter
-}
-
-func (filesystem *filesystem) localPath(server *server) string {
+func (filesystem *Filesystem) localPath(server *Server) string {
 	if filesystem.Local != "" {
 		return filesystem.Local
 	} else {
@@ -19,7 +13,7 @@ func (filesystem *filesystem) localPath(server *server) string {
 	}
 }
 
-func (filesystem *filesystem) String(server *server, direction string) string {
+func (filesystem *Filesystem) String(server *Server, direction string) string {
 	var parts []string
 
 	switch direction {

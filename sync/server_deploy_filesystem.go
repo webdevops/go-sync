@@ -7,7 +7,7 @@ import (
 )
 
 // General sync
-func (filesystem *filesystem) Deploy(server *server) {
+func (filesystem *Filesystem) Deploy(server *Server) {
 	switch server.Connection.GetType() {
 	case "ssh":
 		filesystem.deployRsync(server)
@@ -17,7 +17,7 @@ func (filesystem *filesystem) Deploy(server *server) {
 }
 
 // Sync filesystem using rsync
-func (filesystem *filesystem) deployRsync(server *server) {
+func (filesystem *Filesystem) deployRsync(server *Server) {
 	args := []string{"-rlptD", "--delete-after", "--progress", "--human-readable"}
 
 	// include filter

@@ -30,23 +30,6 @@ func ShellCommandInterfaceBuilder(command string, args ...string) []interface{} 
 	return shellCmd
 }
 
-func DockerGetContainerId(container string) string {
-	if strings.HasPrefix(container, "compose:") {
-		containerName := strings.TrimPrefix(container, "compose:")
-
-		cmd := shell.Cmd("docker-compose", "ps", "-q", containerName).Run()
-		containerId := strings.TrimSpace(cmd.Stdout.String())
-
-		if containerId == "" {
-			panic(fmt.Sprintf("Container \"%s\" not found empty", container))
-		}
-
-		return containerId
-	}
-
-	return container
-}
-
 func CreateTempfile() *os.File {
 	tmpfile, err := ioutil.TempFile("", "gsync")
 	if err != nil {
