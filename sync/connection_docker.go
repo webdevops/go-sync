@@ -25,7 +25,6 @@ func (connection *Connection) DockerCommandBuilder(cmd string, args ...string) [
 	} else {
 		return connection.LocalCommandBuilder("docker", dockerArgs...)
 	}
-
 }
 
 func (connection *Connection) DockerGetContainerId() string {
@@ -58,8 +57,6 @@ func (connection *Connection) DockerGetContainerId() string {
 		// normal docker
 		container = connection.Docker
 	}
-
-	fmt.Println(container)
 
 	// cache value
 	containerCache[cacheKey] = container
