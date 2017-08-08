@@ -1,5 +1,10 @@
 package sync
 
+import (
+	"strings"
+	"github.com/webdevops/go-shell"
+)
+
 func (connection *Connection) CommandBuilder(command string, args ...string) []interface{} {
 	var ret []interface{}
 
@@ -12,6 +17,33 @@ func (connection *Connection) CommandBuilder(command string, args ...string) []i
 		fallthrough
 	case "docker":
 		ret = connection.DockerCommandBuilder(command, args...)
+	default:
+		panic(connection)
+	}
+
+	return ret
+}
+
+func (connection *Connection) ShellCommandBuilder(args ...string) []interface{} {
+	var ret []interface{}
+
+	inlineArgs := []string{}
+
+	for _, val := range args {
+		inlineArgs = append(inlineArgs, val)
+	}
+
+	inlineCommand := shell.Quote(strings.Join(inlineArgs, " "))
+
+	switch connection.GetType() {
+	case "local":
+		ret = connection.LocalCommandBuilder("/bin/sh", "-c", inlineCommand)
+	case "ssh":
+		ret = connection.SshCommandBuilder("/bin/sh", "-c", inlineCommand)
+	case "ssh+docker":
+		fallthrough
+	case "docker":
+		ret = connection.DockerCommandBuilder("/bin/sh", "-c", inlineCommand)
 	default:
 		panic(connection)
 	}
