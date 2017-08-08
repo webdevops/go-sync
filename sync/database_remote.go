@@ -42,7 +42,11 @@ func (database *Database) remoteMysqldumpCmdBuilder(additionalArgs []string, use
 		args = append(args, includeArgs...)
 	}
 
-	return database.remoteConnection.SshCompressedCommandBuilder("mysqldump", args...)
+	cmd := []string{"mysqldump"}
+	cmd = append(cmd, args...)
+	cmd = append(cmd, "|", "gzip --stdout")
+
+	return database.remoteConnection.ShellCommandBuilder(cmd...)
 }
 
 func (database *Database) remoteMysqlCmdBuilder(args ...string) []interface{} {
@@ -101,5 +105,5 @@ func (database *Database) remoteMysqlCmdBuilderUncompress(args ...string) []inte
 
 	cmd := []string{"gunzip", "--stdout", "|", "mysql", strings.Join(args, " ")}
 
-	return database.remoteConnection.CommandBuilder("sh", "-c", shell.Quote(strings.Join(cmd, " ")))
+	return database.remoteConnection.ShellCommandBuilder(strings.Join(cmd, " "))
 }
