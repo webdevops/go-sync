@@ -15,13 +15,16 @@ func (execution *Execution) String(server *Server) string {
 	if execution.Workdir != "" {
 		parts = append(parts, fmt.Sprintf("Workdir:%s", execution.Workdir))
 	}
-	parts = append(parts, fmt.Sprintf("Command:%s", execution.Command))
+	parts = append(parts, fmt.Sprintf("Command:%s", execution.Command.ToString(" ")))
 
 	return fmt.Sprintf("Exec[%s]", strings.Join(parts[:]," "))
 }
 
 func (execution *Execution) Execute(server *Server) {
-	shell.Cmd(execution.commandBuilder(server)...)
+	cmd := execution.commandBuilder(server)
+	run := shell.Cmd(cmd...).Run()
+
+	Logger.Verbose(run.Stdout.String())
 }
 
 func (execution *Execution) commandBuilder(server *Server) []interface{} {
@@ -38,7 +41,13 @@ func (execution *Execution) commandBuilder(server *Server) []interface{} {
 		connection.WorkDir = execution.Workdir
 	}
 
-	return connection.CommandBuilder(execution.Command)
+	if len(execution.Command.Multi) >= 1 {
+		// multi element command (use safer quoting)
+		return connection.ShellCommandBuilder(execution.Command.Multi...)
+	} else {
+		// single string command (use as is)
+		return connection.RawShellCommandBuilder(execution.Command.Single)
+	}
 }
 
 func (execution *Execution) GetType() string {

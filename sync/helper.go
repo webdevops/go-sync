@@ -19,7 +19,7 @@ func ShellCommandInterfaceBuilder(command string, args ...string) []interface{} 
 	}
 
 	for _, val := range args {
-		cmd = append(cmd, shell.Quote(val))
+		cmd = append(cmd, val)
 	}
 
 	shellCmd := make([]interface{}, len(cmd))
@@ -99,6 +99,8 @@ func ShellErrorHandler(recover interface{}) {
 			printMessage("Stdout", process.Stdout.String())
 			printMessage("Stderr", process.Stderr.String())
 			printMessage("Exit code", fmt.Sprintf("%d", p))
+
+			os.Exit(2)
 		}
 	}
 }

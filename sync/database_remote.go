@@ -1,8 +1,8 @@
 package sync
 
 import (
-	"github.com/webdevops/go-shell"
 	"strings"
+	"github.com/webdevops/go-shell"
 )
 
 func (database *Database) remoteMysqldumpCmdBuilder(additionalArgs []string, useFilter bool) []interface{} {
@@ -43,10 +43,10 @@ func (database *Database) remoteMysqldumpCmdBuilder(additionalArgs []string, use
 	}
 
 	cmd := []string{"mysqldump"}
-	cmd = append(cmd, args...)
-	cmd = append(cmd, "|", "gzip --stdout")
+	cmd = append(cmd, shell.QuoteValues(args...)...)
+	cmd = append(cmd, "|", "gzip", "--stdout")
 
-	return database.remoteConnection.ShellCommandBuilder(cmd...)
+	return database.remoteConnection.RawShellCommandBuilder(cmd...)
 }
 
 func (database *Database) remoteMysqlCmdBuilder(args ...string) []interface{} {
@@ -99,11 +99,7 @@ func (database *Database) remoteMysqlCmdBuilderUncompress(args ...string) []inte
 		args = append(args, database.Schema)
 	}
 
-	for key, val := range args {
-		args[key] = shell.Quote(val)
-	}
+	cmd := []string{"gunzip", "--stdout", "|", "mysql", strings.Join(shell.QuoteValues(args...), " ")}
 
-	cmd := []string{"gunzip", "--stdout", "|", "mysql", strings.Join(args, " ")}
-
-	return database.remoteConnection.ShellCommandBuilder(strings.Join(cmd, " "))
+	return database.remoteConnection.RawShellCommandBuilder(cmd...)
 }

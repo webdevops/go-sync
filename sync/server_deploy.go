@@ -2,8 +2,8 @@ package sync
 
 func (server *Server) Deploy() {
 	defer func() {
-		//recover := recover()
-		//ShellErrorHandler(recover)
+		recover := recover()
+		ShellErrorHandler(recover)
 	}()
 
 	server.RunExec("startup")

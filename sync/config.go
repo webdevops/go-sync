@@ -7,7 +7,6 @@ import (
 
 var waitGroup sync.WaitGroup
 
-
 type Filter struct {
 	Exclude []string
 	excludeRegexp []*regexp.Regexp
@@ -62,7 +61,7 @@ type Database struct {
 
 type Execution struct {
 	Type string
-	Command string
+	Command YamlStringArray
 	Workdir string
 	When string
 }

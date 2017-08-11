@@ -7,12 +7,18 @@ import (
 )
 
 func (connection *Connection) CommandBuilder(command string, args ...string) []interface{} {
+	//args = shell.QuoteValues(args...)
+
+	return connection.RawCommandBuilder(command, args...)
+}
+
+func (connection *Connection) RawCommandBuilder(command string, args ...string) []interface{} {
 	var ret []interface{}
 
 	if connection.WorkDir != "" {
 		shellArgs := []string{command}
 		shellArgs = append(shellArgs, args...)
-		return connection.ShellCommandBuilder(shellArgs...)
+		return connection.RawShellCommandBuilder(shellArgs...)
 	}
 
 	switch connection.GetType() {
@@ -32,6 +38,11 @@ func (connection *Connection) CommandBuilder(command string, args ...string) []i
 }
 
 func (connection *Connection) ShellCommandBuilder(args ...string) []interface{} {
+	args = shell.QuoteValues(args...)
+	return connection.RawShellCommandBuilder(args...)
+}
+
+func (connection *Connection) RawShellCommandBuilder(args ...string) []interface{} {
 	var ret []interface{}
 
 	inlineArgs := []string{}
@@ -40,11 +51,13 @@ func (connection *Connection) ShellCommandBuilder(args ...string) []interface{} 
 		inlineArgs = append(inlineArgs, val)
 	}
 
-	inlineCommand := shell.Quote(strings.Join(inlineArgs, " "))
+	inlineCommand := strings.Join(inlineArgs, " ")
 
 	if connection.WorkDir != "" {
 		inlineCommand = fmt.Sprintf("cd %s ; %s", shell.Quote(connection.WorkDir), inlineCommand)
 	}
+
+	inlineCommand = shell.Quote(inlineCommand)
 
 	switch connection.GetType() {
 	case "local":
