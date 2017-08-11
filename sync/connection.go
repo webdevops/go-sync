@@ -3,10 +3,17 @@ package sync
 import (
 	"strings"
 	"github.com/webdevops/go-shell"
+	"fmt"
 )
 
 func (connection *Connection) CommandBuilder(command string, args ...string) []interface{} {
 	var ret []interface{}
+
+	if connection.WorkDir != "" {
+		shellArgs := []string{command}
+		shellArgs = append(shellArgs, args...)
+		return connection.ShellCommandBuilder(shellArgs...)
+	}
 
 	switch connection.GetType() {
 	case "local":
@@ -34,6 +41,10 @@ func (connection *Connection) ShellCommandBuilder(args ...string) []interface{} 
 	}
 
 	inlineCommand := shell.Quote(strings.Join(inlineArgs, " "))
+
+	if connection.WorkDir != "" {
+		inlineCommand = fmt.Sprintf("cd %s ; %s", shell.Quote(connection.WorkDir), inlineCommand)
+	}
 
 	switch connection.GetType() {
 	case "local":

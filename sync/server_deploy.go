@@ -6,8 +6,12 @@ func (server *Server) Deploy() {
 		//ShellErrorHandler(recover)
 	}()
 
+	server.RunExec("startup")
 	server.DeployFilesystem()
 	server.DeployDatabases()
+	server.RunExec("finish")
+
+	waitGroup.Wait()
 }
 
 func (server *Server) DeployFilesystem() {

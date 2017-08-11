@@ -1,6 +1,12 @@
 package sync
 
-import "regexp"
+import (
+	"regexp"
+	"sync"
+)
+
+var waitGroup sync.WaitGroup
+
 
 type Filter struct {
 	Exclude []string
@@ -21,6 +27,7 @@ type Connection struct {
 	User string
 	Password string
 	Docker string
+	WorkDir string
 }
 
 type Database struct {
@@ -53,11 +60,19 @@ type Database struct {
 	remoteConnection Connection
 }
 
+type Execution struct {
+	Type string
+	Command string
+	Workdir string
+	When string
+}
+
 type Server struct {
 	Path string
 	Connection Connection
 	Filesystem []Filesystem
 	Database []Database
+	Exec []Execution
 }
 
 type SyncConfig struct {

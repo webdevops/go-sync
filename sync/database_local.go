@@ -40,32 +40,6 @@ func (database *Database) localMysqldumpCmdBuilder(additionalArgs []string, useF
 	return database.Local.Connection.CommandBuilder("mysqldump", args...)
 }
 
-func (database *Database) localCommandInterface(command string, args ...string) []interface{} {
-	var ret []interface{}
-
-	if database.Local.Connection.Type == "" {
-		database.Local.Connection.Type = "local"
-
-		// autodetection
-		if database.Local.Connection.Docker != "" {
-			database.Local.Connection.Type = "docker"
-		}
-
-		if database.Local.Connection.Hostname != "" {
-			database.Local.Connection.Type = "ssh"
-		}
-	}
-
-	switch database.Local.Connection.Type {
-	case "local":
-		ret = ShellCommandInterfaceBuilder(command, args...)
-	case "ssh":
-		ret = database.Local.Connection.CommandBuilder(command, args...)
-	}
-
-	return ret
-}
-
 func (database *Database) localMysqlCmdBuilder(args ...string) []interface{} {
 	args = append(args, "-BN")
 

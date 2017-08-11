@@ -6,8 +6,12 @@ func (server *Server) Sync() {
 		ShellErrorHandler(recover)
 	}()
 
+	server.RunExec("startup")
 	server.SyncFilesystem()
 	server.SyncDatabases()
+	server.RunExec("finish")
+
+	waitGroup.Wait()
 }
 
 func (server *Server) SyncFilesystem() {
