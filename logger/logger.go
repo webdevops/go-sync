@@ -56,6 +56,11 @@ func (SyncLogger SyncLogger) Step(message string, sprintf ...interface{}) {
 	SyncLogger.Println("   -> " + message)
 }
 
+
+func (SyncLogger SyncLogger) Command(message string) {
+	SyncLogger.Println("   $ " + message)
+}
+
 func (SyncLogger SyncLogger) FatalExit(exitCode int, message string, sprintf ...interface{}) {
 	if len(sprintf) > 0 {
 		message = fmt.Sprintf(message, sprintf...)

@@ -119,6 +119,9 @@ func main() {
 		fallthrough
 	case len(opts.Verbose) >= 1:
 		logger.Verbose = true
+		shell.VerboseFunc = func(c *shell.Command) {
+			Logger.Command(c.ToString())
+		}
 		fallthrough
 	default:
 		if Logger == nil {
