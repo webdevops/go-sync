@@ -8,6 +8,7 @@ import (
 	"strings"
 	flags "github.com/jessevdk/go-flags"
 	"github.com/webdevops/go-shell"
+	"gopkg.in/AlecAivazis/survey.v1"
 	"./sync"
 	"./logger"
 )
@@ -26,10 +27,11 @@ var (
 
 var opts struct {
 	Positional struct {
-		Command string `description:"What to do [help, dump, sync, deploy or show]" choice:"show" choice:"dump" choice:"sync" choice:"deploy" choice:"hjelp" required:"1"`
+		Command string `description:"What to do [help, sync, deploy or show]" choice:"show" choice:"sync" choice:"deploy" choice:"help" required:"1"`
 		Server  string `description:"server configuration key"`
 	} `positional-args:"true"`
 
+	Dump               bool     `           long:"dump"                          description:"dump configuration as yaml"`
 	Verbose            []bool   `short:"v"  long:"verbose"                       description:"verbose mode"`
 	DryRun             bool     `           long:"dry-run"                       description:"dry run mode"`
 	ShowVersion        bool     `short:"V"  long:"version"                       description:"show version and exit"`
@@ -106,6 +108,19 @@ func findConfigFile() string {
 	return ""
 }
 
+func getArgServer(config *sync.SyncConfig, confType string) string {
+	server := opts.Positional.Server
+	if server == "" {
+		prompt := &survey.Select{
+			Message: "Choose configuration:",
+			Options: config.GetServerList(confType),
+		}
+		survey.AskOne(prompt, &server, nil)
+	}
+
+	return server
+}
+
 func main() {
 	createArgparser()
 
@@ -141,39 +156,55 @@ func main() {
 	}
 	Logger.Step("found configuration file %s", configFile)
 
-
 	sync.Logger = Logger
 	config := sync.NewConfigParser(configFile)
 
 	switch argCommand {
 	case "show":
+		//----------------------
+		// Show
+		//----------------------
 		config.ShowConfiguration()
-	case "dump":
-		confServer, err := config.GetSyncServer(opts.Positional.Server)
-		if err != nil {
-			Logger.FatalErrorExit(3, err)
-		}
-		fmt.Println()
-		fmt.Println(confServer.AsYaml())
 	case "sync":
-		confServer, err := config.GetSyncServer(opts.Positional.Server)
+		//----------------------
+		// Sync
+		//----------------------
+		server := getArgServer(config, "sync")
+		confServer, err := config.GetSyncServer(server)
 		if err != nil {
 			Logger.FatalErrorExit(3, err)
 		}
-		Logger.Step("using %s server", opts.Positional.Server)
+		Logger.Step("using %s server", server)
 		Logger.Step("using connection %s", confServer.Connection.String())
-		confServer.Sync()
-	case "deploy":
-		confServer, err := config.GetDeployServer(opts.Positional.Server)
-		if err != nil {
-			Logger.FatalErrorExit(3, err)
-		}
-		Logger.Step("using %s server", opts.Positional.Server)
-		Logger.Step("using connection %s", confServer.Connection.String())
-		confServer.Deploy()
-	}
 
-	Logger.Println("-> finished")
+		// --dump
+		if opts.Dump {
+			fmt.Println()
+			fmt.Println(confServer.AsYaml())
+		} else {
+			confServer.Sync()
+			Logger.Println("-> finished")
+		}
+	case "deploy":
+		//----------------------
+		// Deploy
+		//----------------------
+		server := getArgServer(config, "deploy")
+		confServer, err := config.GetDeployServer(server)
+		if err != nil {
+			Logger.FatalErrorExit(3, err)
+		}
+		Logger.Step("using %s server", server)
+		Logger.Step("using connection %s", confServer.Connection.String())
+		// --dump
+		if opts.Dump {
+			fmt.Println()
+			fmt.Println(confServer.AsYaml())
+		} else {
+			confServer.Deploy()
+			Logger.Println("-> finished")
+		}
+	}
 
 	os.Exit(0)
 }

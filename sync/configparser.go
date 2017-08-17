@@ -60,6 +60,23 @@ func (config *SyncConfig) GetDeployServer(serverName string) (Server, error) {
 	}
 }
 
+func (config *SyncConfig) GetServerList(confType string) []string {
+	ret := []string{}
+
+	switch confType {
+	case "sync":
+		for key := range config.Sync {
+			ret = append(ret, key)
+		}
+	case "deploy":
+		for key := range config.Deploy {
+			ret = append(ret, key)
+		}
+	}
+
+	return ret
+}
+
 func (config *SyncConfig) ListServer() map[string][]string {
 	ret := map[string][]string{}
 
