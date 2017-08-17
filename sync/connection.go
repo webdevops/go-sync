@@ -20,6 +20,8 @@ func (connection *Connection) CommandBuilder(command string, args ...string) []i
 func (connection *Connection) RawCommandBuilder(command string, args ...string) []interface{} {
 	var ret []interface{}
 
+	// if workdir is set
+	// use shell'ed command builder
 	if connection.WorkDir != "" {
 		shellArgs := []string{command}
 		shellArgs = append(shellArgs, args...)
@@ -59,6 +61,7 @@ func (connection *Connection) RawShellCommandBuilder(args ...string) []interface
 	inlineCommand := strings.Join(inlineArgs, " ")
 
 	if connection.WorkDir != "" {
+		// prepend cd in front of command to change work dir
 		inlineCommand = fmt.Sprintf("cd %s ; %s", shell.Quote(connection.WorkDir), inlineCommand)
 	}
 

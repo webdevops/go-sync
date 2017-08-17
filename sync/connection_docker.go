@@ -13,8 +13,10 @@ func (connection *Connection) DockerCommandBuilder(cmd string, args ...string) [
 	dockerArgs = append(dockerArgs, args...)
 
 	if connection.GetType() == "ssh+docker" {
+		// docker on remote server
 		return connection.SshCommandBuilder("docker", dockerArgs...)
 	} else {
+		// local docker server
 		return connection.LocalCommandBuilder("docker", dockerArgs...)
 	}
 }
@@ -25,18 +27,21 @@ func (connection *Connection) DockerGetContainerId() string {
 	cacheKey := fmt.Sprintf("%s:%s", connection.Hostname, connection.Docker)
 
 	if val, ok := containerCache[cacheKey]; ok {
-		// use cached
+		// use cached container id
 		container = val
 	} else if strings.HasPrefix(connection.Docker, "compose:") {
+		// docker-compose container
+		// -> trying to get id from docker-compose
 
 		// copy connection because we need conn without docker usage (endless loop)
 		connectionClone := *connection
 		connectionClone.Docker = ""
 		connectionClone.Type  = "auto"
 
-		// docker-compose
+		// extract docker-compose container name
 		containerName := strings.TrimPrefix(connection.Docker, "compose:")
 
+		// query container id from docker-compose
 		cmd := shell.Cmd(connectionClone.CommandBuilder("docker-compose", "ps", "-q", containerName)...).Run()
 		containerId := strings.TrimSpace(cmd.Stdout.String())
 
