@@ -6,6 +6,11 @@ import (
 	"fmt"
 )
 
+var (
+	ConnectionSshArguments = []string{"-oBatchMode=yes -oPasswordAuthentication=no"}
+	ConnectionDockerArguments = []string{"exec", "-i"}
+)
+
 func (connection *Connection) CommandBuilder(command string, args ...string) []interface{} {
 	//args = shell.QuoteValues(args...)
 

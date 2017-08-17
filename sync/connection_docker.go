@@ -9,16 +9,8 @@ import (
 var containerCache = map[string]string{}
 
 func (connection *Connection) DockerCommandBuilder(cmd string, args ...string) []interface{} {
-	dockerArgs := []string{
-		"exec",
-		"-i",
-		connection.DockerGetContainerId(),
-		cmd,
-	}
-
-	for _, val := range args {
-		dockerArgs = append(dockerArgs, val)
-	}
+	dockerArgs := append(ConnectionDockerArguments, connection.DockerGetContainerId(), cmd)
+	dockerArgs = append(dockerArgs, args...)
 
 	if connection.GetType() == "ssh+docker" {
 		return connection.SshCommandBuilder("docker", dockerArgs...)

@@ -13,13 +13,7 @@ func (connection *Connection) SshCommandBuilder(command string, args ...string) 
 	}
 	remoteCmd := shell.Quote(strings.Join(remoteCmdParts, " "))
 
-	sshArgs := []string{
-		"-oBatchMode=yes",
-		"-oPasswordAuthentication=no",
-		connection.SshConnectionHostnameString(),
-		"--",
-		remoteCmd,
-	}
+	sshArgs := append(ConnectionSshArguments, connection.SshConnectionHostnameString(), "--", remoteCmd)
 
 	return ShellCommandInterfaceBuilder("ssh", sshArgs...)
 }
