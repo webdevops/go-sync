@@ -12,7 +12,7 @@ const (
 	prefixMain = ":: "
 	prefixSub  = "   -> "
 	prefixCmd  = "      $ "
-	prefixErr  = " [ERROR] "
+	prefixErr  = "[ERROR] "
 )
 
 type SyncLogger struct {

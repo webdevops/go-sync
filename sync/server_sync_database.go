@@ -3,6 +3,8 @@ package sync
 import (
 	"github.com/webdevops/go-shell"
 	"fmt"
+	"io/ioutil"
+	"os"
 )
 
 func (database *Database) Sync(server *Server) {
@@ -23,7 +25,6 @@ func (database *Database) syncClearDatabase(server *Server) {
 	schema := database.Local.Schema
 	database.Local.Schema = ""
 
-
 	Logger.Step("dropping local database \"%s\"", schema)
 	dropStmt := fmt.Sprintf("DROP DATABASE IF EXISTS `%s`", schema)
 	dropCmd := shell.Cmd("echo", shell.Quote(dropStmt)).Pipe(database.localMysqlCmdBuilder()...)
@@ -41,22 +42,36 @@ func (database *Database) syncClearDatabase(server *Server) {
 func (database *Database) syncStructure(server *Server) {
 	Logger.Step("syncing database structure")
 
+	tmpfile, err := ioutil.TempFile("", "dump")
+	if err != nil {
+		panic(err)
+	}
+	defer os.Remove(tmpfile.Name())
+
 	// Sync structure only
 	dumpCmd := database.remoteMysqldumpCmdBuilder([]string{"--no-data"}, false)
-	restoreCmd := database.localMysqlCmdBuilder()
+	shell.Cmd(dumpCmd...).Pipe("cat", ">", tmpfile.Name()).Run()
 
-	cmd := shell.Cmd(dumpCmd...).Pipe("gunzip", "--stdout").Pipe(restoreCmd...)
-	cmd.Run()
+	// Restore structure only
+	restoreCmd := database.localMysqlCmdBuilder()
+	shell.Cmd("cat", tmpfile.Name()).Pipe("gunzip", "--stdout").Pipe(restoreCmd...).Run()
 }
 
 // Sync database data
 func (database *Database) syncData(server *Server) {
 	Logger.Step("syncing database data")
 
-	// Sync data only
-	dumpCmd := database.remoteMysqldumpCmdBuilder([]string{"--no-create-info"}, true)
-	restoreCmd := database.localMysqlCmdBuilder()
+	tmpfile, err := ioutil.TempFile("", "dump")
+	if err != nil {
+		panic(err)
+	}
+	defer os.Remove(tmpfile.Name())
 
-	cmd := shell.Cmd(dumpCmd...).Pipe("gunzip", "--stdout").Pipe(restoreCmd...)
-	cmd.Run()
+	// Sync data only
+	dumpCmd := database.remoteMysqldumpCmdBuilder([]string{"--no-create-info"}, false)
+	shell.Cmd(dumpCmd...).Pipe("cat", ">", tmpfile.Name()).Run()
+
+	// Restore data only
+	restoreCmd := database.localMysqlCmdBuilder()
+	shell.Cmd("cat", tmpfile.Name()).Pipe("gunzip", "--stdout").Pipe(restoreCmd...).Run()
 }
