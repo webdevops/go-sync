@@ -154,6 +154,7 @@ func main() {
 			Logger.FatalErrorExit(3, err)
 		}
 		Logger.Step("using %s server", opts.Positional.Server)
+		Logger.Step("using connection %s", confServer.Connection.String())
 		confServer.Sync()
 	case "deploy":
 		confServer, err := config.GetDeployServer(opts.Positional.Server)
@@ -161,6 +162,7 @@ func main() {
 			Logger.FatalErrorExit(3, err)
 		}
 		Logger.Step("using %s server", opts.Positional.Server)
+		Logger.Step("using connection %s", confServer.Connection.String())
 		confServer.Deploy()
 	}
 

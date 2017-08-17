@@ -114,3 +114,23 @@ func (connection *Connection) GetType() string {
 
 	return connType
 }
+
+func (connection *Connection) String() string {
+	var parts []string
+
+	connType := connection.GetType()
+	parts = append(parts, fmt.Sprintf("Type:%s", connType))
+
+	switch connType {
+	case "ssh":
+		parts = append(parts, fmt.Sprintf("SSH:%s", connection.SshConnectionHostnameString()))
+	case "docker":
+		parts = append(parts, fmt.Sprintf("Docker:%s", connection.Docker))
+	case "ssh+docker":
+		parts = append(parts, fmt.Sprintf("SSH:%s", connection.SshConnectionHostnameString()))
+		parts = append(parts, fmt.Sprintf("Docker:%s", connection.Docker))
+	default:
+	}
+
+	return fmt.Sprintf("Exec[%s]", strings.Join(parts[:]," "))
+}
