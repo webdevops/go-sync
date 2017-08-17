@@ -26,7 +26,7 @@ var (
 
 var opts struct {
 	Positional struct {
-		Command string `description:"What to do [help, sync, deploy or show]" choice:"show" choice:"sync" choice:"deploy" choice:"hjelp" required:"1"`
+		Command string `description:"What to do [help, dump, sync, deploy or show]" choice:"show" choice:"dump" choice:"sync" choice:"deploy" choice:"hjelp" required:"1"`
 		Server  string `description:"server configuration key"`
 	} `positional-args:"true"`
 
@@ -148,6 +148,13 @@ func main() {
 	switch argCommand {
 	case "show":
 		config.ShowConfiguration()
+	case "dump":
+		confServer, err := config.GetSyncServer(opts.Positional.Server)
+		if err != nil {
+			Logger.FatalErrorExit(3, err)
+		}
+		fmt.Println()
+		fmt.Println(confServer.AsYaml())
 	case "sync":
 		confServer, err := config.GetSyncServer(opts.Positional.Server)
 		if err != nil {
