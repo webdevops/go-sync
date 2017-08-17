@@ -9,6 +9,10 @@ import (
 
 const (
 	LogPrefix = ""
+	prefixMain = ":: "
+	prefixSub  = "   -> "
+	prefixCmd  = "      $ "
+	prefixErr  = " [ERROR] "
 )
 
 type SyncLogger struct {
@@ -45,7 +49,7 @@ func (SyncLogger SyncLogger) Main(message string, sprintf ...interface{}) {
 		message = fmt.Sprintf(message, sprintf...)
 	}
 
-	SyncLogger.Println(":: " + message)
+	SyncLogger.Println(prefixMain + message)
 }
 
 func (SyncLogger SyncLogger) Step(message string, sprintf ...interface{}) {
@@ -53,12 +57,12 @@ func (SyncLogger SyncLogger) Step(message string, sprintf ...interface{}) {
 		message = fmt.Sprintf(message, sprintf...)
 	}
 
-	SyncLogger.Println("   -> " + message)
+	SyncLogger.Println(prefixSub + message)
 }
 
 
 func (SyncLogger SyncLogger) Command(message string) {
-	SyncLogger.Println("   $ " + message)
+	SyncLogger.Println(prefixCmd + message)
 }
 
 func (SyncLogger SyncLogger) FatalExit(exitCode int, message string, sprintf ...interface{}) {
@@ -79,7 +83,7 @@ func (SyncLogger SyncLogger) FatalErrorExit(exitCode int, err error) {
 		fmt.Fprintln(os.Stderr, fmt.Sprintf("Command: %s", cmdline))
 	}
 
-	fmt.Fprintln(os.Stderr, fmt.Sprintf("Error: %s", err))
+	fmt.Fprintln(os.Stderr, fmt.Sprintf("%s %s", prefixErr, err))
 
 	os.Exit(exitCode)
 }
