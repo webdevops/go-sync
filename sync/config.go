@@ -63,7 +63,6 @@ type Execution struct {
 	Type string
 	Command YamlStringArray
 	Workdir string
-	When string
 }
 
 type Server struct {
@@ -71,7 +70,8 @@ type Server struct {
 	Connection Connection
 	Filesystem []Filesystem
 	Database []Database
-	Exec []Execution
+	ExecStartup []Execution `yaml:"exec-startup"`
+	ExecFinish []Execution `yaml:"exec-finish"`
 }
 
 type SyncConfig struct {

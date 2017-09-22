@@ -1,5 +1,7 @@
 package sync
 
+import "fmt"
+
 func (server *Server) RunExec(when string) {
 	defer func() {
 		recover := recover()
@@ -19,11 +21,12 @@ func (server *Server) RunExec(when string) {
 }
 
 func (server *Server) GetExecByWhen(when string) []Execution {
-	var execList []Execution
-
-	for _, val := range server.Exec {
-		execList = append(execList, val)
+	switch when {
+	case "startup":
+		return server.ExecStartup
+	case "finish":
+		return server.ExecFinish
+	default:
+		panic(fmt.Sprintf("execution list %s is not valid", when))
 	}
-
-	return execList
 }
