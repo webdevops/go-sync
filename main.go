@@ -16,7 +16,7 @@ import (
 const (
 	Name    = "gosync"
 	Author  = "webdevops.io"
-	Version = "1.0.0"
+	Version = "0.1.0"
 )
 
 var (
