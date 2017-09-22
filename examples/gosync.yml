@@ -1,32 +1,191 @@
 ---
 
+#########################
+## Sync
+#########################
 sync:
   production: &production
-    localPath: ./test/
-    foobar: ./test/
+
+    ## Base path for sync
+    path: "./test/"
 
     connection:
       type: ssh
-      hostname: remote
-      user: user
-      password: password
+      hostname: example.com
+      user: ssh-user
+
+    #########################
+    ## Filesystem rsync
+    #########################
+    filesystem:
+    ## Sync /tmp/remote/path to ./test/ (defined before)
+    - path: /tmp/remote/path
+      filter:
+        exclude:
+        - .git
+        - node_modules/
+
+    ## Sync /tmp/remote/other/path to ./other/
+    - path: /tmp/remote/other/path
+      local: ./other/
+      filter:
+        exclude:
+        - .git
+        - node_modules/
+
+    #########################
+    ## Database
+    #########################
+    database:
+
+    ## NORMAL MYSQL
+    ## Sync schema typo3 to local test-local (without cache tables)
+    ##
+    ## remote: connect via ssh and get dump from local installed mysql
+    ## local: connect via mysql to a database server "mysql.example.com"
+    - type: mysql
+      schema: application1
+      user: mysql-user
+      password: mysql-password
+      filter:
+        exclude:
+        - "^cache_.*"
+        include:
+      local:
+        ## use plain mysql connection
+        schema: test-application1
+        user: root
+        password: dev
+        port: 13306
+        hostname: mysql.example.com
+      options:
+        ## clear database before restore
+        ## (delete all tables inside)
+        clear-database: true
+
+    ## DOCKER
+    ## Sync schema typo3 to local test-local into a docker container
+    ##
+    ## remote: connect via ssh and get dump from local installed mysql
+    ## local: use docker container "2713f9093bed" for restore
+    - type: mysql
+      schema: application2
+      user: mysql-user
+      password: mysql-password
+      filter:
+        exclude:
+        include:
+      local:
+        schema: test-application2
+        user: root
+        password: dev
+        connection:
+          docker: 2713f9093bed
+      options:
+        ## clear database before restore
+        ## (delete all tables inside)
+        clear-database: true
+
+    ## DOCKER-COMPOSE
+    ## Sync schema typo3 to local test-local into a docker-compose container
+    ##
+    ## docker-compose.yml has to be in the same or parent directory!
+    ##
+    ## remote: connect via ssh and get dump from local installed mysql
+    ## local: use docker-compose container "mysql" for restore
+    - type: mysql
+      schema: application3
+      user: mysql-user
+      password: mysql-password
+      filter:
+        exclude:
+        include:
+      local:
+        schema: test-application3
+        user: root
+        password: dev
+        connection:
+          docker: compose:mysql
+      options:
+        ## clear database before restore
+        ## (delete all tables inside)
+        clear-database: true
+
+    #########################
+    ## Execute
+    #########################
+    exec-startup:
+    ## Execute date on local system
+    - type: local
+      command: date +%s
+
+    ## Execute date on local system (alternative style)
+    - type: local
+      command:
+      - date
+      - +%s
+
+    ## Execute date with workdir
+    - type: local
+      command:
+      - date
+      workdir: /
+
+    ## Execute remote date with workdir
+    - type: remote
+      command: date
+      workdir: /
+
+    exec-finish:
+    ## Execute remote date with workdir
+    - type: remote
+      command: date
+      workdir: /
+
+#########################
+## Deploy
+#########################
+deploy:
+  production: &foobar
+    path: "./test/"
+
+    connection:
+      type: ssh
+      hostname: example.com
+      user: ssh-user
 
     filesystem:
-      - path:
+    - path: /tmp/path
+      filter:
         exclude:
+        - .git
+        - node_modules/
 
-    databases:
+    - path: /tmp/other/path
+      local: ./other/
+      filter:
+        exclude:
+        - .git
+        - node_modules/
+
+    database:
       - type: mysql
-        database: typo3
-        username: root
-        password: dev
+        schema: foobar
+        user: mysql-user
+        password: mysql-password
         filter:
           exclude:
-            <<: *databaseExcludeTYPO3
           include:
+        local:
+          schema: test
+          user: root
+          password: dev
+          connection:
+            docker: compose:mysql
+            user: root
+            password: dev
+        options:
+          clear-database: true
 
-deploy:
-  production:
-    <<: *production
-    connection:
-      type: docker
+  production2:
+    <<: *foobar
