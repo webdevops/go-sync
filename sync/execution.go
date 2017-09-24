@@ -4,6 +4,7 @@ import (
 	"strings"
 	"github.com/webdevops/go-shell"
 	"fmt"
+	"github.com/webdevops/go-shell/commandbuilder"
 )
 
 func (execution *Execution) String(server *Server) string {
@@ -28,11 +29,11 @@ func (execution *Execution) Execute(server *Server) {
 }
 
 func (execution *Execution) commandBuilder(server *Server) []interface{} {
-	var connection Connection
+	var connection commandbuilder.Connection
 
 	switch execution.GetType() {
 	case "local":
-		connection = Connection{Type:"local"}
+		connection = commandbuilder.Connection{Type:"local"}
 	case "remote":
 		connection = server.Connection
 	}

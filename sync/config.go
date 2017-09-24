@@ -3,6 +3,7 @@ package sync
 import (
 	"regexp"
 	"sync"
+	"github.com/webdevops/go-shell/commandbuilder"
 )
 
 var waitGroup sync.WaitGroup
@@ -20,14 +21,6 @@ type Filesystem struct {
 	Filter Filter
 }
 
-type Connection struct {
-	Type string
-	Hostname string
-	User string
-	Password string
-	Docker string
-	WorkDir string
-}
 
 type Database struct {
 	Type string
@@ -46,7 +39,7 @@ type Database struct {
 		User string
 		Password string
 
-		Connection Connection
+		Connection commandbuilder.Connection
 	}
 	Options struct {
 		ClearDatabase bool `yaml:"clear-database"`
@@ -56,7 +49,7 @@ type Database struct {
 	cacheRemoteTableList []string
 	cacheLocalTableList []string
 
-	remoteConnection Connection
+	remoteConnection commandbuilder.Connection
 }
 
 type Execution struct {
@@ -67,7 +60,7 @@ type Execution struct {
 
 type Server struct {
 	Path string
-	Connection Connection
+	Connection commandbuilder.Connection
 	Filesystem []Filesystem
 	Database []Database
 	ExecStartup []Execution `yaml:"exec-startup"`

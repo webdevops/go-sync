@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"errors"
 	"os"
+	"github.com/webdevops/go-shell"
 )
 
 // General sync
@@ -45,6 +46,6 @@ func (filesystem *Filesystem) deployRsync(server *Server) {
 	// make sure source/target paths are using suffix slash
 	args = append(args, RsyncPath(sourcePath), RsyncPath(targetPath))
 
-	cmd := NewShellCommand("rsync", args...)
+	cmd := shell.NewCmd("rsync", args...)
 	cmd.Run()
 }

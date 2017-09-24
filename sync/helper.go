@@ -9,27 +9,6 @@ import (
 	"fmt"
 )
 
-func NewShellCommand(command string, args ...string) *shell.Command {
-	return shell.Cmd(ShellCommandInterfaceBuilder(command, args...)...)
-}
-
-func ShellCommandInterfaceBuilder(command string, args ...string) []interface{} {
-	cmd := []string{
-		command,
-	}
-
-	for _, val := range args {
-		cmd = append(cmd, val)
-	}
-
-	shellCmd := make([]interface{}, len(cmd))
-	for i, v := range cmd {
-		shellCmd[i] = v
-	}
-
-	return shellCmd
-}
-
 func CreateTempfile() *os.File {
 	tmpfile, err := ioutil.TempFile("", "gsync")
 	if err != nil {

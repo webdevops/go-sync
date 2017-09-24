@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"strings"
 	"github.com/webdevops/go-shell"
+	"github.com/webdevops/go-shell/commandbuilder"
 )
 
 
-func (database *Database) mysqlTableFilter(connection *Connection, connectionType string) ([]string, []string) {
+func (database *Database) mysqlTableFilter(connection *commandbuilder.Connection, connectionType string) ([]string, []string) {
 	var exclude []string
 	var include []string
 
