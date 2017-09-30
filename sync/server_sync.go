@@ -16,8 +16,13 @@ func (server *Server) Sync() {
 
 func (server *Server) SyncFilesystem() {
 	for _, filesystem := range server.Filesystem {
-		Logger.Main("Starting sync of %s", filesystem.String(server, "sync"))
-		filesystem.Sync(server)
+		if filesystem.Options.GenerateStubs {
+			Logger.Main("Starting stub generator for %s", filesystem.String(server, "sync"))
+			filesystem.SyncStubs(server)
+		} else {
+			Logger.Main("Starting sync of %s", filesystem.String(server, "sync"))
+			filesystem.Sync(server)
+		}
 	}
 }
 

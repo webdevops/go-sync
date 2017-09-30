@@ -19,6 +19,9 @@ type Filesystem struct {
 	Path string
 	Local string
 	Filter Filter
+	Options struct {
+		GenerateStubs bool `yaml:"generate-stubs"`
+	}
 }
 
 

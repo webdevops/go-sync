@@ -15,6 +15,13 @@ func (server *Server) Deploy() {
 }
 
 func (server *Server) DeployFilesystem() {
+	// check for generate-stubs option (not allowed)
+	for _, filesystem := range server.Filesystem {
+		if filesystem.Options.GenerateStubs {
+			Logger.FatalExit(2, "Generate Stubs is not allowed for deployment")
+		}
+	}
+
 	for _, filesystem := range server.Filesystem {
 		Logger.Main("Starting deploy of %s", filesystem.String(server, "deploy"))
 		filesystem.Deploy(server)

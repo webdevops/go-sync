@@ -33,6 +33,12 @@ sync:
         - .git
         - node_modules/
 
+    ## Create file stubs for /tmp/remote/other/path to ./other/
+    - path: /tmp/remote/other/path-big-files
+      local: ./other-stubs/
+      options:
+        generate-stubs: true
+
     #########################
     ## Database
     #########################

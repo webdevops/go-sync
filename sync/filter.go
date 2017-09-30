@@ -20,6 +20,30 @@ func (filter *Filter) compile() {
 	}
 }
 
+func (filter *Filter) ApplyFilter(lines []string) []string {
+	filter.compile()
+
+	if len(filter.Include) > 0 {
+		lines = filter.calculateMatching(filter.includeRegexp, lines)
+	}
+
+	if len(filter.Exclude) > 0 {
+		excludes := filter.calculateMatching(filter.excludeRegexp, lines)
+
+		tmp := []string{}
+		for _, line := range lines {
+			if ! stringInSlice(line, excludes) {
+				tmp = append(tmp, line)
+			}
+		}
+
+		lines = tmp
+	}
+
+	return lines
+}
+
+
 func (filter *Filter) CalcExcludes(lines []string) []string {
 	filter.compile()
 	return filter.calculateMatching(filter.excludeRegexp, lines)
@@ -42,4 +66,13 @@ func (filter *Filter) calculateMatching(regexpList []*regexp.Regexp, lines []str
 	}
 
 	return ret
+}
+
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
 }
