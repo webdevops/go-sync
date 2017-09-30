@@ -174,8 +174,8 @@ func main() {
 		if err != nil {
 			Logger.FatalErrorExit(3, err)
 		}
-		Logger.Step("using %s server", server)
-		Logger.Step("using connection %s", confServer.Connection.String())
+		Logger.Step("using Server[%s]", server)
+		Logger.Step("using %s", confServer.Connection.String())
 
 		// --dump
 		if opts.Dump {
