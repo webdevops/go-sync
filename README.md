@@ -19,6 +19,7 @@ General:
 
 Sync:
 - Filesync (rsync) from remote servers using SSH
+- Create file stubs instead of fetching files from remote (with real images, see ``options.generate-stubs = true``)
 - Dump MySQL schemas from remote servers using SSH, Docker and SSH+Docker
 - Restore MySQL schema to local MySQL servers or Docker/Docker-Compose containers
 - Filtering databases tabes with regexp
