@@ -7,6 +7,12 @@ import (
 	"github.com/webdevops/go-shell/commandbuilder"
 )
 
+func (database *Database) ApplyDefaults(server *Server) {
+	// set default connection if not set
+	if (commandbuilder.Connection{}) == database.Connection {
+		database.Connection = server.Connection
+	}
+}
 
 func (database *Database) mysqlTableFilter(connection *commandbuilder.Connection, connectionType string) ([]string, []string) {
 	var exclude []string

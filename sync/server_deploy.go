@@ -23,14 +23,17 @@ func (server *Server) DeployFilesystem() {
 	}
 
 	for _, filesystem := range server.Filesystem {
-		Logger.Main("Starting deploy of %s", filesystem.String(server, "deploy"))
-		filesystem.Deploy(server)
+		filesystem.ApplyDefaults(server)
+
+		Logger.Main("Starting deploy of %s", filesystem.String( "deploy"))
+		filesystem.Deploy()
 	}
 }
 
 func (server *Server) DeployDatabases() {
 	for _, database := range server.Database {
+		database.ApplyDefaults(server)
 		Logger.Main("Starting deploy of %s", database.String("deploy"))
-		database.Deploy(server)
+		database.Deploy()
 	}
 }

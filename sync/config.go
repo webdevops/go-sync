@@ -19,6 +19,7 @@ type Filesystem struct {
 	Path string
 	Local string
 	Filter Filter
+	Connection commandbuilder.Connection
 	Options struct {
 		GenerateStubs bool `yaml:"generate-stubs"`
 	}
@@ -52,7 +53,7 @@ type Database struct {
 	cacheRemoteTableList []string
 	cacheLocalTableList []string
 
-	remoteConnection commandbuilder.Connection
+	Connection commandbuilder.Connection
 }
 
 type Execution struct {

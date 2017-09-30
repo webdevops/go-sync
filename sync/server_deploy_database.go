@@ -5,19 +5,17 @@ import (
 	"fmt"
 )
 
-func (database *Database) Deploy(server *Server) {
-	database.remoteConnection = server.Connection
-
+func (database *Database) Deploy() {
 	if database.Options.ClearDatabase {
-		database.deployClearDatabase(server)
+		database.deployClearDatabase()
 	}
 
-	database.deployStructure(server)
-	database.deployData(server)
+	database.deployStructure()
+	database.deployData()
 }
 
 // Deploy database structure
-func (database *Database) deployClearDatabase(server *Server) {
+func (database *Database) deployClearDatabase() {
 
 	// don't use database which we're trying to drop, instead use "mysql"
 	schema := database.Schema
@@ -37,7 +35,7 @@ func (database *Database) deployClearDatabase(server *Server) {
 }
 
 // Deploy database structure
-func (database *Database) deployStructure(server *Server) {
+func (database *Database) deployStructure() {
 	Logger.Step("deploy database structure")
 
 	// Deploy structure only
@@ -49,7 +47,7 @@ func (database *Database) deployStructure(server *Server) {
 }
 
 // Deploy database data
-func (database *Database) deployData(server *Server) {
+func (database *Database) deployData() {
 	Logger.Step("deploy database data")
 
 	// Deploy data only

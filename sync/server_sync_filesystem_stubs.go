@@ -11,22 +11,24 @@ import (
 )
 
 // General sync
-func (filesystem *Filesystem) SyncStubs(server *Server) {
-	switch server.Connection.GetType() {
+func (filesystem *Filesystem) SyncStubs() {
+	switch filesystem.Connection.GetType() {
+	case "local":
+		fallthrough
 	case "ssh":
-		filesystem.generateStubs(server)
+		filesystem.generateStubs()
 	case "docker":
 		errors.New("Docker not supported")
 	}
 }
 
 // Sync filesystem using rsync
-func (filesystem *Filesystem) generateStubs(server *Server) {
-	cmd := shell.Cmd(server.Connection.CommandBuilder("find", filesystem.Path, "-type f")...)
+func (filesystem *Filesystem) generateStubs() {
+	cmd := shell.Cmd(filesystem.Connection.CommandBuilder("find", filesystem.Path, "-type f")...)
 	output := cmd.Run().Stdout.String()
 
 	removeBasePath := filesystem.Path
-	localBasePath := filesystem.localPath(server)
+	localBasePath := filesystem.localPath()
 
 	// build list and filter it by user filter list
 	fileList := []string{}
@@ -36,14 +38,13 @@ func (filesystem *Filesystem) generateStubs(server *Server) {
 	}
 	fileList = filesystem.Filter.ApplyFilter(fileList)
 
-
 	// generate stubs
 	stubGen := stubfilegenerator.StubGenerator()
 	for _, filePath := range fileList {
 		localPath := path.Join(localBasePath, filePath)
+		localAbsPath, _ := filepath.Abs(localPath)
 
 		stubGen.TemplateVariables["PATH"] = localPath
-		localAbsPath, _ := filepath.Abs(localPath)
 		stubGen.GenerateStub(localAbsPath)
 	}
 }

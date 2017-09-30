@@ -29,7 +29,7 @@ func (database *Database) remoteMysqldumpCmdBuilder(additionalArgs []string, use
 	}
 
 	// exclude
-	excludeArgs, includeArgs := database.mysqlTableFilter(&database.remoteConnection, "remote");
+	excludeArgs, includeArgs := database.mysqlTableFilter(&database.Connection, "remote");
 	if useFilter && len(excludeArgs) > 0 {
 		args = append(args, excludeArgs...)
 	}
@@ -46,7 +46,7 @@ func (database *Database) remoteMysqldumpCmdBuilder(additionalArgs []string, use
 	cmd = append(cmd, shell.QuoteValues(args...)...)
 	cmd = append(cmd, "|", "gzip", "--stdout")
 
-	return database.remoteConnection.RawShellCommandBuilder(cmd...)
+	return database.Connection.RawShellCommandBuilder(cmd...)
 }
 
 func (database *Database) remoteMysqlCmdBuilder(args ...string) []interface{} {
@@ -72,7 +72,7 @@ func (database *Database) remoteMysqlCmdBuilder(args ...string) []interface{} {
 		args = append(args, database.Schema)
 	}
 
-	return database.remoteConnection.CommandBuilder("mysql", args...)
+	return database.Connection.CommandBuilder("mysql", args...)
 }
 
 
@@ -101,5 +101,5 @@ func (database *Database) remoteMysqlCmdBuilderUncompress(args ...string) []inte
 
 	cmd := []string{"gunzip", "--stdout", "|", "mysql", strings.Join(shell.QuoteValues(args...), " ")}
 
-	return database.remoteConnection.RawShellCommandBuilder(cmd...)
+	return database.Connection.RawShellCommandBuilder(cmd...)
 }

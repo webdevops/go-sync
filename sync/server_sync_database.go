@@ -7,19 +7,17 @@ import (
 	"os"
 )
 
-func (database *Database) Sync(server *Server) {
-	database.remoteConnection = server.Connection
-
+func (database *Database) Sync() {
 	if database.Options.ClearDatabase {
-		database.syncClearDatabase(server)
+		database.syncClearDatabase()
 	}
 
-	database.syncStructure(server)
-	database.syncData(server)
+	database.syncStructure()
+	database.syncData()
 }
 
 // Sync database structure
-func (database *Database) syncClearDatabase(server *Server) {
+func (database *Database) syncClearDatabase() {
 
 	// don't use database which we're trying to drop, instead use "mysql"
 	schema := database.Local.Schema
@@ -39,7 +37,7 @@ func (database *Database) syncClearDatabase(server *Server) {
 }
 
 // Sync database structure
-func (database *Database) syncStructure(server *Server) {
+func (database *Database) syncStructure() {
 	Logger.Step("syncing database structure")
 
 	tmpfile, err := ioutil.TempFile("", "dump")
@@ -58,7 +56,7 @@ func (database *Database) syncStructure(server *Server) {
 }
 
 // Sync database data
-func (database *Database) syncData(server *Server) {
+func (database *Database) syncData() {
 	Logger.Step("syncing database data")
 
 	tmpfile, err := ioutil.TempFile("", "dump")
