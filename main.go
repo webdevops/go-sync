@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"path"
 	"strings"
+	"runtime/debug"
 	flags "github.com/jessevdk/go-flags"
 	"github.com/webdevops/go-shell"
 	"gopkg.in/AlecAivazis/survey.v1"
@@ -122,6 +123,19 @@ func getArgServer(config *sync.SyncConfig, confType string) string {
 }
 
 func main() {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println()
+			if len(opts.Verbose) >= 2 {
+				fmt.Println(r)
+				debug.PrintStack()
+			} else {
+				fmt.Println(r)
+			}
+			os.Exit(255)
+		}
+	}()
+
 	createArgparser()
 
 	argCommand := strings.ToLower(opts.Positional.Command)
