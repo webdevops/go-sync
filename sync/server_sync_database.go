@@ -8,16 +8,21 @@ import (
 )
 
 func (database *Database) Sync() {
-	if database.Options.ClearDatabase {
-		database.syncClearDatabase()
-	}
+	switch database.Type {
+	case "mysql":
+		if database.Options.ClearDatabase {
+			database.syncMysqlClearDatabase()
+		}
 
-	database.syncStructure()
-	database.syncData()
+		database.syncMysqlStructure()
+		database.syncMysqlData()
+	default:
+		panic(fmt.Sprintf("Database type %s is not valid or supported", database.Type))
+	}
 }
 
 // Sync database structure
-func (database *Database) syncClearDatabase() {
+func (database *Database) syncMysqlClearDatabase() {
 
 	// don't use database which we're trying to drop, instead use "mysql"
 	schema := database.Local.Schema
@@ -37,7 +42,7 @@ func (database *Database) syncClearDatabase() {
 }
 
 // Sync database structure
-func (database *Database) syncStructure() {
+func (database *Database) syncMysqlStructure() {
 	Logger.Step("syncing database structure")
 
 	tmpfile, err := ioutil.TempFile("", "dump")
@@ -56,7 +61,7 @@ func (database *Database) syncStructure() {
 }
 
 // Sync database data
-func (database *Database) syncData() {
+func (database *Database) syncMysqlData() {
 	Logger.Step("syncing database data")
 
 	tmpfile, err := ioutil.TempFile("", "dump")

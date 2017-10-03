@@ -6,16 +6,21 @@ import (
 )
 
 func (database *Database) Deploy() {
-	if database.Options.ClearDatabase {
-		database.deployClearDatabase()
-	}
+	switch database.Type {
+	case "mysql":
+		if database.Options.ClearDatabase {
+			database.deployMysqlClearDatabase()
+		}
 
-	database.deployStructure()
-	database.deployData()
+		database.deployMysqlStructure()
+		database.deployMysqlData()
+	default:
+		panic(fmt.Sprintf("Database type %s is not valid or supported", database.Type))
+	}
 }
 
 // Deploy database structure
-func (database *Database) deployClearDatabase() {
+func (database *Database) deployMysqlClearDatabase() {
 
 	// don't use database which we're trying to drop, instead use "mysql"
 	schema := database.Schema
@@ -35,7 +40,7 @@ func (database *Database) deployClearDatabase() {
 }
 
 // Deploy database structure
-func (database *Database) deployStructure() {
+func (database *Database) deployMysqlStructure() {
 	Logger.Step("deploy database structure")
 
 	// Deploy structure only
@@ -47,7 +52,7 @@ func (database *Database) deployStructure() {
 }
 
 // Deploy database data
-func (database *Database) deployData() {
+func (database *Database) deployMysqlData() {
 	Logger.Step("deploy database data")
 
 	// Deploy data only
