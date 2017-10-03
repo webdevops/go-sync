@@ -64,10 +64,19 @@ sync:
         password: dev
         port: 13306
         hostname: mysql.example.com
+        options:
+          # custom mysqldump options (for local)
+          mysqldump:
+          # custom mysql options (for local)
+          mysql:
       options:
         ## clear database before restore
         ## (delete all tables inside)
         clear-database: true
+        # custom mysqldump options (for remote)
+        mysqldump:
+        # custom mysql options (for remote)
+        mysql:
 
     ## DOCKER
     ## Sync schema typo3 to local test-local into a docker container

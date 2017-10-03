@@ -9,19 +9,19 @@ func (database *Database) remoteMysqldumpCmdBuilder(additionalArgs []string, use
 	var args []string
 
 	if database.User != "" {
-		args = append(args, "-u" + database.User)
+		args = append(args, shell.Quote("-u" + database.User))
 	}
 
 	if database.Password != "" {
-		args = append(args, "-p" + database.Password)
+		args = append(args, shell.Quote("-p" + database.Password))
 	}
 
 	if database.Hostname != "" {
-		args = append(args, "-h" + database.Hostname)
+		args = append(args, shell.Quote("-h" + database.Hostname))
 	}
 
 	if database.Port != "" {
-		args = append(args, "-P" + database.Port)
+		args = append(args, shell.Quote("-P" + database.Port))
 	}
 
 	if len(args) > 0 {
@@ -35,7 +35,7 @@ func (database *Database) remoteMysqldumpCmdBuilder(additionalArgs []string, use
 	}
 
 	// schema
-	args = append(args, database.Schema)
+	args = append(args, shell.Quote(database.Schema))
 
 	// include
 	if useFilter && len(includeArgs) > 0 {
@@ -43,7 +43,13 @@ func (database *Database) remoteMysqldumpCmdBuilder(additionalArgs []string, use
 	}
 
 	cmd := []string{"mysqldump"}
-	cmd = append(cmd, shell.QuoteValues(args...)...)
+
+	// add custom options (raw)
+	if database.Options.Mysqldump != "" {
+		cmd = append(cmd, database.Options.Mysqldump)
+	}
+
+	cmd = append(cmd, args...)
 	cmd = append(cmd, "|", "gzip", "--stdout")
 
 	return database.Connection.RawShellCommandBuilder(cmd...)
@@ -53,26 +59,31 @@ func (database *Database) remoteMysqlCmdBuilder(args ...string) []interface{} {
 	args = append(args, "-BN")
 
 	if database.User != "" {
-		args = append(args, "-u" + database.User)
+		args = append(args, shell.Quote("-u" + database.User))
 	}
 
 	if database.Password != "" {
-		args = append(args, "-p" + database.Password)
+		args = append(args, shell.Quote("-p" + database.Password))
 	}
 
 	if database.Hostname != "" {
-		args = append(args, "-h" + database.Hostname)
+		args = append(args, shell.Quote("-h" + database.Hostname))
 	}
 
 	if database.Port != "" {
-		args = append(args, "-P" + database.Port)
+		args = append(args, shell.Quote("-P" + database.Port))
 	}
 
 	if database.Schema != "" {
-		args = append(args, database.Schema)
+		args = append(args, shell.Quote(database.Schema))
 	}
 
-	return database.Connection.CommandBuilder("mysql", args...)
+	// append options in raw
+	if database.Options.Mysqldump != "" {
+		args = append(args, database.Options.Mysql)
+	}
+
+	return database.Connection.RawCommandBuilder("mysql", args...)
 }
 
 
@@ -80,26 +91,31 @@ func (database *Database) remoteMysqlCmdBuilderUncompress(args ...string) []inte
 	args = append(args, "-BN")
 
 	if database.User != "" {
-		args = append(args, "-u" + database.User)
+		args = append(args, shell.Quote("-u" + database.User))
 	}
 
 	if database.Password != "" {
-		args = append(args, "-p" + database.Password)
+		args = append(args, shell.Quote("-p" + database.Password))
 	}
 
 	if database.Hostname != "" {
-		args = append(args, "-h" + database.Hostname)
+		args = append(args, shell.Quote("-h" + database.Hostname))
 	}
 
 	if database.Port != "" {
-		args = append(args, "-P" + database.Port)
+		args = append(args, shell.Quote("-P" + database.Port))
+	}
+
+	// add custom options (raw)
+	if database.Options.Mysqldump != "" {
+		args = append(args, database.Options.Mysql)
 	}
 
 	if database.Schema != "" {
-		args = append(args, database.Schema)
+		args = append(args, shell.Quote(database.Schema))
 	}
 
-	cmd := []string{"gunzip", "--stdout", "|", "mysql", strings.Join(shell.QuoteValues(args...), " ")}
+	cmd := []string{"gunzip", "--stdout", "|", "mysql", strings.Join(args, " ")}
 
 	return database.Connection.RawShellCommandBuilder(cmd...)
 }

@@ -40,7 +40,7 @@ func (database *Database) mysqlTableFilter(connection *commandbuilder.Connection
 	// calc excludes
 	excludeTableList := database.Filter.CalcExcludes(tableList)
 	for _, table := range excludeTableList {
-		exclude  = append(exclude, fmt.Sprintf("--ignore-table=%s.%s", database.Schema, table))
+		exclude  = append(exclude, shell.Quote(fmt.Sprintf("--ignore-table=%s.%s", database.Schema, table)))
 	}
 
 	// calc includes

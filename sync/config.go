@@ -25,6 +25,11 @@ type Filesystem struct {
 	}
 }
 
+type DatabaseOptions struct {
+	ClearDatabase bool `yaml:"clear-database"`
+	Mysqldump string
+	Mysql string
+}
 
 type Database struct {
 	Type string
@@ -35,6 +40,8 @@ type Database struct {
 	Password string
 
 	Filter Filter
+	Connection commandbuilder.Connection
+
 	Local struct {
 		Type string
 		Schema string
@@ -44,16 +51,13 @@ type Database struct {
 		Password string
 
 		Connection commandbuilder.Connection
+		Options DatabaseOptions
 	}
-	Options struct {
-		ClearDatabase bool `yaml:"clear-database"`
-	}
+	Options DatabaseOptions
 
 	// local cache
 	cacheRemoteTableList []string
 	cacheLocalTableList []string
-
-	Connection commandbuilder.Connection
 }
 
 type Execution struct {
