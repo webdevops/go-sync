@@ -77,22 +77,29 @@ func (config *SyncConfig) GetServerList(confType string) []string {
 	return ret
 }
 
+// List all possible server configurations
 func (config *SyncConfig) ListServer() map[string][]string {
 	ret := map[string][]string{}
 
-	ret["Sync"] = make([]string, len(config.Sync)-1)
-	for key := range config.Sync {
-		ret["Sync"] = append(ret["Sync"], key)
+	if len(config.Sync) > 0 {
+		ret["Sync"] = make([]string, len(config.Sync)-1)
+		for key := range config.Sync {
+			ret["Sync"] = append(ret["Sync"], key)
+		}
 	}
 
-	ret["Deploy"] = make([]string, len(config.Deploy)-1)
-	for key := range config.Deploy {
-		ret["Deploy"] = append(ret["Deploy"], key)
+	if len(config.Deploy) > 0 {
+		ret["Deploy"] = make([]string, len(config.Deploy)-1)
+		for key := range config.Deploy {
+			ret["Deploy"] = append(ret["Deploy"], key)
+		}
 	}
 
 	return ret
 }
 
+// Show all possible server configurations
+// in an human readable style
 func (config *SyncConfig) ShowConfiguration() {
 	serverList := config.ListServer()
 
