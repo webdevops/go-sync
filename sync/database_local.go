@@ -3,15 +3,15 @@ package sync
 import "github.com/webdevops/go-shell"
 
 func (database *Database) localMysqldumpCmdBuilder(additionalArgs []string, useFilter bool) []interface{} {
+	connection := database.Local.Connection.Clone()
 	var args []string
-
 
 	if database.Local.User != "" {
 		args = append(args, shell.Quote("-u" + database.Local.User))
 	}
 
 	if database.Local.Password != "" {
-		args = append(args, shell.Quote("-p" + database.Local.Password))
+		connection.Environment["MYSQL_PWD"] = database.Local.Password
 	}
 
 	if database.Local.Hostname != "" {
@@ -45,10 +45,11 @@ func (database *Database) localMysqldumpCmdBuilder(additionalArgs []string, useF
 		args = append(args, includeArgs...)
 	}
 
-	return database.Local.Connection.RawCommandBuilder("mysqldump", args...)
+	return connection.RawCommandBuilder("mysqldump", args...)
 }
 
 func (database *Database) localMysqlCmdBuilder(args ...string) []interface{} {
+	connection := database.Local.Connection.Clone()
 	args = append(args, "-BN")
 
 	if database.Local.User != "" {
@@ -56,7 +57,7 @@ func (database *Database) localMysqlCmdBuilder(args ...string) []interface{} {
 	}
 
 	if database.Local.Password != "" {
-		args = append(args, shell.Quote("-p" + database.Local.Password))
+		connection.Environment["MYSQL_PWD"] = database.Local.Password
 	}
 
 	if database.Local.Hostname != "" {
@@ -76,6 +77,6 @@ func (database *Database) localMysqlCmdBuilder(args ...string) []interface{} {
 		args = append(args, shell.Quote(database.Local.Schema))
 	}
 
-	return database.Local.Connection.RawCommandBuilder("mysql", args...)
+	return connection.RawCommandBuilder("mysql", args...)
 }
 

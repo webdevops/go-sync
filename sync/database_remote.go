@@ -6,6 +6,7 @@ import (
 )
 
 func (database *Database) remoteMysqldumpCmdBuilder(additionalArgs []string, useFilter bool) []interface{} {
+	connection := database.Connection.Clone()
 	var args []string
 
 	if database.User != "" {
@@ -13,7 +14,7 @@ func (database *Database) remoteMysqldumpCmdBuilder(additionalArgs []string, use
 	}
 
 	if database.Password != "" {
-		args = append(args, shell.Quote("-p" + database.Password))
+		connection.Environment["MYSQL_PWD"] = database.Password
 	}
 
 	if database.Hostname != "" {
@@ -52,10 +53,11 @@ func (database *Database) remoteMysqldumpCmdBuilder(additionalArgs []string, use
 	cmd = append(cmd, args...)
 	cmd = append(cmd, "|", "gzip", "--stdout")
 
-	return database.Connection.RawShellCommandBuilder(cmd...)
+	return connection.RawShellCommandBuilder(cmd...)
 }
 
 func (database *Database) remoteMysqlCmdBuilder(args ...string) []interface{} {
+	connection := database.Connection.Clone()
 	args = append(args, "-BN")
 
 	if database.User != "" {
@@ -63,7 +65,7 @@ func (database *Database) remoteMysqlCmdBuilder(args ...string) []interface{} {
 	}
 
 	if database.Password != "" {
-		args = append(args, shell.Quote("-p" + database.Password))
+		connection.Environment["MYSQL_PWD"] = database.Password
 	}
 
 	if database.Hostname != "" {
@@ -83,11 +85,12 @@ func (database *Database) remoteMysqlCmdBuilder(args ...string) []interface{} {
 		args = append(args, database.Options.Mysql)
 	}
 
-	return database.Connection.RawCommandBuilder("mysql", args...)
+	return connection.RawCommandBuilder("mysql", args...)
 }
 
 
 func (database *Database) remoteMysqlCmdBuilderUncompress(args ...string) []interface{} {
+	connection := database.Connection.Clone()
 	args = append(args, "-BN")
 
 	if database.User != "" {
@@ -95,7 +98,7 @@ func (database *Database) remoteMysqlCmdBuilderUncompress(args ...string) []inte
 	}
 
 	if database.Password != "" {
-		args = append(args, shell.Quote("-p" + database.Password))
+		connection.Environment["MYSQL_PWD"] = database.Password
 	}
 
 	if database.Hostname != "" {
@@ -117,5 +120,5 @@ func (database *Database) remoteMysqlCmdBuilderUncompress(args ...string) []inte
 
 	cmd := []string{"gunzip", "--stdout", "|", "mysql", strings.Join(args, " ")}
 
-	return database.Connection.RawShellCommandBuilder(cmd...)
+	return connection.RawShellCommandBuilder(cmd...)
 }
