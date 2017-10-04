@@ -24,7 +24,7 @@ func (filesystem *Filesystem) SyncStubs() {
 
 // Sync filesystem using rsync
 func (filesystem *Filesystem) generateStubs() {
-	cmd := shell.Cmd(filesystem.Connection.CommandBuilder("find", filesystem.Path, "-type f")...)
+	cmd := shell.Cmd(filesystem.Connection.CommandBuilder("find", filesystem.Path, "-type", "f")...)
 	output := cmd.Run().Stdout.String()
 
 	removeBasePath := filesystem.Path

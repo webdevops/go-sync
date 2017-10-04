@@ -76,6 +76,6 @@ func (database *Database) localMysqlCmdBuilder(args ...string) []interface{} {
 		args = append(args, shell.Quote(database.Local.Schema))
 	}
 
-	return database.Local.Connection.CommandBuilder("mysql", args...)
+	return database.Local.Connection.RawCommandBuilder("mysql", args...)
 }
 
