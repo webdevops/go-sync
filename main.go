@@ -4,12 +4,9 @@ import (
 	"os"
 	"log"
 	"fmt"
-	"path"
 	"runtime/debug"
 	flags "github.com/jessevdk/go-flags"
 	"github.com/webdevops/go-shell"
-	"gopkg.in/AlecAivazis/survey.v1"
-	"./sync"
 	"./logger"
 )
 
@@ -36,7 +33,7 @@ var validConfigFiles = []string{
 	".gosync.yaml",
 }
 
-func createArgparser() {
+func handleArgParser() {
 	var err error
 	argparser = flags.NewParser(&opts, flags.Default)
 	argparser.CommandHandler = func(command flags.Commander, args []string) error {
@@ -80,50 +77,6 @@ func createArgparser() {
 	}
 }
 
-func findConfigFile() string {
-	pwd, err := os.Getwd()
-	if err != nil {
-		Logger.FatalErrorExit(1, err)
-		fmt.Println(err)
-	}
-
-	for true {
-		for _, filename := range validConfigFiles {
-			filepath := path.Join(pwd, filename)
-			if sync.FileExists(filepath) {
-				return filepath
-			}
-		}
-
-
-		// already found root, we finished here
-		if pwd == "/" {
-			break
-		}
-
-		pwd = path.Dir(pwd)
-
-		// oh, path seems to be empty.. stopping here now
-		if pwd == "." || pwd == "" {
-			break
-		}
-	}
-
-	return ""
-}
-
-func getArgServer(config *sync.SyncConfig, confType string, userSelection string) string {
-	if userSelection == "" {
-		prompt := &survey.Select{
-			Message: "Choose configuration:",
-			Options: config.GetServerList(confType),
-		}
-		survey.AskOne(prompt, &userSelection, nil)
-	}
-
-	return userSelection
-}
-
 func main() {
 	defer func() {
 		if r := recover(); r != nil {
@@ -138,7 +91,7 @@ func main() {
 		}
 	}()
 
-	createArgparser()
+	handleArgParser()
 
 	os.Exit(0)
 }

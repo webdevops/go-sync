@@ -13,7 +13,7 @@ type DeployCommand struct {
 // Run deployment command
 func (command *DeployCommand) Execute(args []string) error {
 	config := command.GetConfig()
-	server := getArgServer(config, "deploy", command.Positional.Server)
+	server := command.getServerSelectionFromUser(config, "deploy", command.Positional.Server)
 	confServer, err := config.GetDeployServer(server)
 	if err != nil {
 		Logger.FatalErrorExit(3, err)

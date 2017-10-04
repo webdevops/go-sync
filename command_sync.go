@@ -13,7 +13,7 @@ type SyncCommand struct {
 // Run sync command
 func (command *SyncCommand) Execute(args []string) error {
 	config := command.GetConfig()
-	server := getArgServer(config, "sync", command.Positional.Server)
+	server := command.getServerSelectionFromUser(config, "sync", command.Positional.Server)
 	confServer, err := config.GetSyncServer(server)
 	if err != nil {
 		Logger.FatalErrorExit(3, err)
