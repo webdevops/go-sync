@@ -9,7 +9,7 @@ import (
 
 func (database *Database) ApplyDefaults(server *Server) {
 	// set default connection if not set
-	if (commandbuilder.Connection{}) == database.Connection {
+	if database.Connection.IsEmpty() {
 		database.Connection = server.Connection
 	}
 }

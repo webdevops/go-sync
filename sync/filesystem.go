@@ -3,12 +3,11 @@ package sync
 import (
 	"fmt"
 	"strings"
-	"github.com/webdevops/go-shell/commandbuilder"
 )
 
 func (filesystem *Filesystem) ApplyDefaults(server *Server) {
 	// set default connection if not set
-	if (commandbuilder.Connection{}) == filesystem.Connection {
+	if filesystem.Connection.IsEmpty() {
 		filesystem.Connection = server.Connection
 	}
 

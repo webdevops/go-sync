@@ -31,6 +31,11 @@ type DatabaseOptions struct {
 	Mysql string
 }
 
+type EnvironmentVar struct {
+	Name string
+	Value string
+}
+
 type Database struct {
 	Type string
 	Schema string
@@ -64,6 +69,7 @@ type Execution struct {
 	Type string
 	Command YamlStringArray
 	Workdir string
+	Environment []EnvironmentVar
 	Options struct {
 	}
 }
