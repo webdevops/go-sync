@@ -151,6 +151,15 @@ sync:
       command: date
       workdir: /
 
+
+    ## Execute remote date with workdir and custom environment settings
+    - type: remote
+      command: date
+      workdir: /
+      environment:
+      - name: FOOBAR
+        value: barfoo
+
     exec-finish:
     ## Execute remote date with workdir
     - type: remote
