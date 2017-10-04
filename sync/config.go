@@ -64,6 +64,8 @@ type Execution struct {
 	Type string
 	Command YamlStringArray
 	Workdir string
+	Options struct {
+	}
 }
 
 type Server struct {
