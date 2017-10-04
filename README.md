@@ -33,6 +33,26 @@ Deployment:
 - Rsync filters
 - Custom exec scripts (startup/finish) on local or remote machine (using SSH)
 
+Help
+====
+
+```
+Usage:
+  gosync [OPTIONS] <command>
+
+Application Options:
+  -v, --verbose  verbose mode
+
+Help Options:
+  -h, --help     Show this help message
+
+Available commands:
+  deploy   Deploy to server
+  list     List server configurations
+  sync     Sync from server
+  version  Show version
+```
+
 Example
 =======
 
