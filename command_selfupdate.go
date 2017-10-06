@@ -16,6 +16,7 @@ type SelfUpdateCommand struct {
 	GithubOrganization  string
 	GithubRepository    string
 	GithubAssetTemplate string
+	Force  bool   `long:"force"  description:"force update"`
 }
 
 func (conf *SelfUpdateCommand) Execute(args []string) error {
@@ -31,7 +32,7 @@ func (conf *SelfUpdateCommand) Execute(args []string) error {
 	fmt.Println(fmt.Sprintf(" - latest version is %s", release.GetName()))
 
 	// check if latest version is current version
-	if release.GetName() == conf.CurrentVersion {
+	if !conf.Force && release.GetName() == conf.CurrentVersion {
 		fmt.Println(" - already using the latest version")
 		return nil
 	}
