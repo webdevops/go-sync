@@ -12,6 +12,7 @@ import (
 )
 
 type SelfUpdateCommand struct {
+	CurrentVersion      string
 	GithubOrganization  string
 	GithubRepository    string
 	GithubAssetTemplate string
@@ -29,12 +30,20 @@ func (conf *SelfUpdateCommand) Execute(args []string) error {
 
 	fmt.Println(fmt.Sprintf(" - latest version is %s", release.GetName()))
 
+	// check if latest version is current version
+	if release.GetName() == conf.CurrentVersion {
+		fmt.Println(" - already using the latest version")
+		return nil
+	}
+
+	// translate OS names
 	os := runtime.GOOS
 	switch (runtime.GOOS) {
 	case "darwin":
 		os = "osx"
 	}
 
+	// translate arch names
 	arch := runtime.GOARCH
 	switch (arch) {
 	case "amd64":
@@ -42,12 +51,14 @@ func (conf *SelfUpdateCommand) Execute(args []string) error {
 	case "386":
 		arch = "x32"
 	}
+
+	// build asset name
 	assetName := conf.GithubAssetTemplate
 	assetName = strings.Replace(assetName, "%OS%", os, -1)
 	assetName = strings.Replace(assetName, "%ARCH%", arch, -1)
 
+	// search assets in release for the desired filename
 	fmt.Println(fmt.Sprintf(" - searching for asset \"%s\"", assetName))
-
 	for _, asset := range release.Assets {
 		if asset.GetName() == assetName {
 			downloadUrl := asset.GetBrowserDownloadURL()
@@ -73,6 +84,7 @@ func (conf *SelfUpdateCommand) runUpdate(url string) error {
 	err = update.Apply(resp.Body, update.Options{})
 	if err != nil {
 		// error handling
+		fmt.Println(fmt.Sprintf(" - updating application failed: %s", err))
 	}
 	return err
 }

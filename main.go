@@ -65,7 +65,7 @@ func handleArgParser() {
 	}
 
 	argparser.AddCommand("version", "Show version", fmt.Sprintf("Show %s version", Name), &VersionCommand{Name:Name, Version:Version, Author:Author})
-	argparser.AddCommand("self-update", "Self update", "Run self update of this application", &SelfUpdateCommand{GithubOrganization:GithubOrganization, GithubRepository:GithubRepository, GithubAssetTemplate:GithubAssetTemplate})
+	argparser.AddCommand("self-update", "Self update", "Run self update of this application", &SelfUpdateCommand{GithubOrganization:GithubOrganization, GithubRepository:GithubRepository, GithubAssetTemplate:GithubAssetTemplate, CurrentVersion:Version})
 
 	argparser.AddCommand("list", "List server configurations", "List server configurations", &ListCommand{})
 	argparser.AddCommand("sync", "Sync from server", "Sync filesystem and databases from server", &SyncCommand{})
