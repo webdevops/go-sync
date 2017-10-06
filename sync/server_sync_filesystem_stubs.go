@@ -31,8 +31,6 @@ func (filesystem *Filesystem) generateStubs() {
 	conn.Hostname = "foobar"
 	conn.User = "itops"
 
-
-
 	cmd := shell.Cmd(filesystem.Connection.CommandBuilder("find", filesystem.Path, "-type", "f")...)
 	output := cmd.Run().Stdout.String()
 
@@ -58,7 +56,7 @@ func (filesystem *Filesystem) generateStubs() {
 			localAbsPath, _ := filepath.Abs(localPath)
 
 			stubGen.TemplateVariables["PATH"] = localPath
-			stubGen.GenerateStub(localAbsPath)
+			stubGen.Generate(localAbsPath)
 		} (filePath, stubGen.Clone())
 		swg.Wait()
 	}
