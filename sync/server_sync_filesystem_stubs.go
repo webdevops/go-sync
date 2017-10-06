@@ -4,10 +4,13 @@ import (
 	"errors"
 	"bufio"
 	"strings"
+	"runtime"
 	"path"
 	"path/filepath"
 	"github.com/webdevops/go-shell"
 	"github.com/webdevops/go-stubfilegenerator"
+	"github.com/webdevops/go-shell/commandbuilder"
+	"github.com/remeh/sizedwaitgroup"
 )
 
 // General sync
@@ -24,6 +27,12 @@ func (filesystem *Filesystem) SyncStubs() {
 
 // Sync filesystem using rsync
 func (filesystem *Filesystem) generateStubs() {
+	conn := commandbuilder.Connection{}
+	conn.Hostname = "foobar"
+	conn.User = "itops"
+
+
+
 	cmd := shell.Cmd(filesystem.Connection.CommandBuilder("find", filesystem.Path, "-type", "f")...)
 	output := cmd.Run().Stdout.String()
 
@@ -39,12 +48,18 @@ func (filesystem *Filesystem) generateStubs() {
 	fileList = filesystem.Filter.ApplyFilter(fileList)
 
 	// generate stubs
-	stubGen := stubfilegenerator.StubGenerator()
+	swg := sizedwaitgroup.New(runtime.GOMAXPROCS(0) * 10)
+	stubGen := stubfilegenerator.NewStubGenerator()
 	for _, filePath := range fileList {
-		localPath := path.Join(localBasePath, filePath)
-		localAbsPath, _ := filepath.Abs(localPath)
+		swg.Add()
+		go func(filePath string, stubGen stubfilegenerator.StubGenerator) {
+			defer swg.Done()
+			localPath := path.Join(localBasePath, filePath)
+			localAbsPath, _ := filepath.Abs(localPath)
 
-		stubGen.TemplateVariables["PATH"] = localPath
-		stubGen.GenerateStub(localAbsPath)
+			stubGen.TemplateVariables["PATH"] = localPath
+			stubGen.GenerateStub(localAbsPath)
+		} (filePath, stubGen.Clone())
+		swg.Wait()
 	}
 }
