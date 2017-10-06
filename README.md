@@ -47,10 +47,12 @@ Help Options:
   -h, --help     Show this help message
 
 Available commands:
-  deploy   Deploy to server
-  list     List server configurations
-  sync     Sync from server
-  version  Show version
+  deploy       Deploy to server
+  list         List server configurations
+  self-update  Self update
+  sync         Sync from server
+  version      Show version
+
 ```
 
 Example

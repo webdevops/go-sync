@@ -3,11 +3,11 @@ TAG ?= $(shell git describe --tags)
 GOBUILD = go build -ldflags '-w'
 
 ALL = \
-	$(foreach arch,64 32,\
+	$(foreach arch,x64 x32,\
 	$(foreach suffix,linux osx,\
-		build/gosync-$(arch)-$(suffix))) \
+		build/gosync-$(suffix)-$(arch))) \
 	$(foreach arch,arm arm64,\
-		build/gosync-$(arch)-linux)
+		build/gosync-linux-$(arch))
 
 all: test build
 
@@ -24,19 +24,19 @@ clean:
 # os is determined as thus: if variable of suffix exists, it's taken, if not, then
 # suffix itself is taken
 osx = darwin
-build/gosync-64-%: $(SOURCE)
+build/gosync-%-x64: $(SOURCE)
 	@mkdir -p $(@D)
 	CGO_ENABLED=0 GOOS=$(firstword $($*) $*) GOARCH=amd64 $(GOBUILD) -o $@
 
-build/gosync-32-%: $(SOURCE)
+build/gosync-%-x32: $(SOURCE)
 	@mkdir -p $(@D)
 	CGO_ENABLED=0 GOOS=$(firstword $($*) $*) GOARCH=386 $(GOBUILD) -o $@
 
-build/gosync-arm-linux: $(SOURCE)
+build/gosync-linux-arm: $(SOURCE)
 	@mkdir -p $(@D)
 	CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=6 $(GOBUILD) -o $@
 
-build/gosync-arm64-linux: $(SOURCE)
+build/gosync-linux-arm64: $(SOURCE)
 	@mkdir -p $(@D)
 	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 $(GOBUILD) -o $@
 
