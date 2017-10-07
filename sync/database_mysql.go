@@ -4,14 +4,115 @@ import (
 	"fmt"
 	"strings"
 	"github.com/webdevops/go-shell"
-	"github.com/webdevops/go-shell/commandbuilder"
 )
 
 type DatabaseMysql struct {
 	Database
 }
 
-func (database *DatabaseMysql) tableFilter(connection *commandbuilder.Connection, connectionType string) ([]string, []string) {
+func (database *DatabaseMysql) init() {
+	// LOCAL
+	if database.Local.Connection.Docker != "" {
+		queryConn := database.Local.Connection.Clone()
+		queryConn.Type = "auto"
+		queryConn.Docker = ""
+
+		// docker auto hostname
+		database.Local.Hostname = "127.0.0.1"
+
+		if database.Local.User == "" || database.Local.Schema == "" {
+			containerId := queryConn.DockerGetContainerId(database.Local.Connection.Docker)
+			containerEnv := queryConn.DockerGetEnvironment(containerId)
+
+			// try to guess user/password
+			if database.Local.User == "" {
+				if val, ok := containerEnv["MYSQL_ROOT_PASSWORD"]; ok {
+					// get root pass from env
+					if database.Local.User == "" && database.Local.Password == "" {
+						fmt.Println("   -> local: using mysql root account (from MYSQL_ROOT_PASSWORD)")
+						database.Local.User = "root"
+						database.Local.Password = val
+					}
+				} else if val, ok := containerEnv["MYSQL_ALLOW_EMPTY_PASSWORD"]; ok {
+					// get root without password from env
+					if val == "yes" && database.Local.User == "" {
+						fmt.Println("   -> local: using mysql root account (from MYSQL_ALLOW_EMPTY_PASSWORD)")
+						database.Local.User = "root"
+						database.Local.Password = ""
+					}
+				} else if user, ok := containerEnv["MYSQL_USER"]; ok {
+					if pass, ok := containerEnv["MYSQL_PASSWORD"]; ok {
+						if database.Local.User == "" && database.Local.Password == "" {
+							fmt.Println("   -> local: using mysql user account (from MYSQL_USER and MYSQL_PASSWORD)")
+							database.Local.User = user
+							database.Local.Password = pass
+						}
+					}
+				}
+			}
+
+			// get schema from env
+			if database.Local.Schema == "" {
+				if val, ok := containerEnv["MYSQL_DATABASE"]; ok {
+					fmt.Println("   -> local: using mysql schema (from MYSQL_DATABASE)")
+					database.Local.Schema = val
+				}
+			}
+		}
+	}
+
+	// Remote
+	if database.Connection.Docker != "" {
+		queryConn := database.Connection.Clone()
+		queryConn.Type = "auto"
+		queryConn.Docker = ""
+
+		// docker auto hostname
+		database.Hostname = "127.0.0.1"
+
+		if database.User == "" || database.Schema == "" {
+			containerId := queryConn.DockerGetContainerId(database.Connection.Docker)
+			containerEnv := queryConn.DockerGetEnvironment(containerId)
+
+			// try to guess user/password
+			if database.User == "" {
+				if val, ok := containerEnv["MYSQL_ROOT_PASSWORD"]; ok {
+					// get root pass from env
+					if database.User == "" && database.Password == "" {
+						fmt.Println("   -> remote: using mysql root account (from MYSQL_ROOT_PASSWORD)")
+						database.User = "root"
+						database.Password = val
+					}
+				} else if val, ok := containerEnv["MYSQL_ALLOW_EMPTY_PASSWORD"]; ok {
+					// get root without password from env
+					if val == "yes" && database.User == "" {
+						fmt.Println("   -> remote: using mysql root account (from MYSQL_ALLOW_EMPTY_PASSWORD)")
+						database.User = "root"
+						database.Password = ""
+					}
+				} else if user, ok := containerEnv["MYSQL_USER"]; ok {
+					if pass, ok := containerEnv["MYSQL_PASSWORD"]; ok {
+						if database.User == "" && database.Password == "" {
+							fmt.Println("   -> remote: using mysql user account (from MYSQL_USER and MYSQL_PASSWORD)")
+							database.User = user
+							database.Password = pass
+						}
+					}
+				}
+			}
+
+			// get schema from env
+			if database.Schema == "" {
+				if val, ok := containerEnv["MYSQL_DATABASE"]; ok {
+					fmt.Println("   -> remote: using mysql schema (from MYSQL_DATABASE)")
+					database.Schema = val
+				}
+			}
+		}
+	}
+}
+
+func (database *DatabaseMysql) tableFilter(connectionType string) ([]string, []string) {
 	var exclude []string
 	var include []string
 

@@ -27,7 +27,7 @@ func (database *DatabasePostgres) localPgdumpCmdBuilder(additionalArgs []string,
 	}
 
 	// exclude
-	excludeArgs, includeArgs := database.tableFilter(&database.Local.Connection, "local");
+	excludeArgs, includeArgs := database.tableFilter("local");
 	if useFilter && len(excludeArgs) > 0 {
 		args = append(args, excludeArgs...)
 	}

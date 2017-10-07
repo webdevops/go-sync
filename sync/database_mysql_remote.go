@@ -30,7 +30,7 @@ func (database *DatabaseMysql) remoteMysqldumpCmdBuilder(additionalArgs []string
 	}
 
 	// exclude
-	excludeArgs, includeArgs := database.tableFilter(&database.Connection, "remote");
+	excludeArgs, includeArgs := database.tableFilter("remote");
 	if useFilter && len(excludeArgs) > 0 {
 		args = append(args, excludeArgs...)
 	}

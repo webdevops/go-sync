@@ -30,11 +30,15 @@ func (database *Database) GetType() string {
 }
 
 func (database *Database) GetMysql() DatabaseMysql {
-	return DatabaseMysql{*database}
+	mysql := DatabaseMysql{*database}
+	mysql.init()
+	return mysql
 }
 
 func (database *Database) GetPostgres() DatabasePostgres {
-	return DatabasePostgres{*database}
+	postgres := DatabasePostgres{*database}
+	postgres.init()
+	return postgres
 }
 
 func (database *Database) String(direction string) string {

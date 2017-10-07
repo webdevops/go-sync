@@ -4,14 +4,96 @@ import (
 	"fmt"
 	"strings"
 	"github.com/webdevops/go-shell"
-	"github.com/webdevops/go-shell/commandbuilder"
 )
 
 type DatabasePostgres struct {
 	Database
 }
 
-func (database *DatabasePostgres) tableFilter(connection *commandbuilder.Connection, connectionType string) ([]string, []string) {
+
+func (database *DatabasePostgres) init() {
+	// LOCAL
+	if database.Local.Connection.Docker != "" {
+		queryConn := database.Local.Connection.Clone()
+		queryConn.Type = "auto"
+		queryConn.Docker = ""
+
+		// docker auto hostname
+		database.Local.Hostname = "127.0.0.1"
+
+		if database.Local.User == "" || database.Local.Schema == "" {
+			containerId := queryConn.DockerGetContainerId(database.Local.Connection.Docker)
+			containerEnv := queryConn.DockerGetEnvironment(containerId)
+
+			// try to guess user/password
+			if database.Local.User == "" {
+				// get superuser pass from env
+				if pass, ok := containerEnv["POSTGRES_PASSWORD"]; ok {
+					if user, ok := containerEnv["POSTGRES_USER"]; ok {
+						fmt.Println("   -> local: using postgres superadmin account (from POSTGRES_USER and POSTGRES_PASSWORD)")
+						database.Local.User = user
+						database.Local.Password = pass
+					} else {
+						fmt.Println("   -> local: using postgres superadmin account (from POSTGRES_PASSWORD)")
+						// only password available
+						database.Local.User = "postgres"
+						database.Local.Password = pass
+					}
+				}
+			}
+
+			// get schema from env
+			if database.Local.Schema == "" {
+				if val, ok := containerEnv["POSTGRES_DB"]; ok {
+					fmt.Println("   -> local: using postgres schema (from POSTGRES_DB)")
+					database.Local.Schema = val
+				}
+			}
+		}
+	}
+
+	// Remote
+	if database.Connection.Docker != "" {
+		queryConn := database.Connection.Clone()
+		queryConn.Type = "auto"
+		queryConn.Docker = ""
+
+		// docker auto hostname
+		database.Hostname = "127.0.0.1"
+
+		if database.User == "" || database.Schema == "" {
+			containerId := queryConn.DockerGetContainerId(database.Connection.Docker)
+			containerEnv := queryConn.DockerGetEnvironment(containerId)
+
+			// try to guess user/password
+			if database.User == "" {
+				// get superuser pass from env
+				if pass, ok := containerEnv["POSTGRES_PASSWORD"]; ok {
+					if user, ok := containerEnv["POSTGRES_USER"]; ok {
+						fmt.Println("   -> remote: using postgres superadmin account (from POSTGRES_USER and POSTGRES_PASSWORD)")
+						database.User = user
+						database.Password = pass
+					} else {
+						fmt.Println("   -> remote: using postgres superadmin account (from POSTGRES_PASSWORD)")
+						// only password available
+						database.User = "postgres"
+						database.Password = pass
+					}
+				}
+			}
+
+			// get schema from env
+			if database.Schema == "" {
+				if val, ok := containerEnv["POSTGRES_DB"]; ok {
+					fmt.Println("   -> remote: using postgres schema (from POSTGRES_DB)")
+					database.Schema = val
+				}
+			}
+		}
+	}
+}
+
+func (database *DatabasePostgres) tableFilter(connectionType string) ([]string, []string) {
 	var exclude []string
 	var include []string
 
