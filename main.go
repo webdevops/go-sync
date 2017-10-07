@@ -99,6 +99,7 @@ func main() {
 		}
 	}()
 
+	shell.SetDefaultShell("bash")
 	handleArgParser()
 
 	os.Exit(0)
