@@ -8,21 +8,97 @@ import (
 )
 
 func (database *Database) Sync() {
-	switch database.Type {
+	switch database.GetType() {
 	case "mysql":
-		if database.Options.ClearDatabase {
-			database.syncMysqlClearDatabase()
+		mysql := database.GetMysql()
+		if mysql.Options.ClearDatabase {
+			mysql.syncClearDatabase()
 		}
 
-		database.syncMysqlStructure()
-		database.syncMysqlData()
-	default:
-		panic(fmt.Sprintf("Database type %s is not valid or supported", database.Type))
+		mysql.syncStructure()
+		mysql.syncData()
+
+	case "postgres":
+		postgres := database.GetPostgres()
+
+		if postgres.Options.ClearDatabase {
+			postgres.syncClearDatabase()
+		}
+
+		postgres.syncStructure()
+		postgres.syncData()
 	}
 }
 
+//#############################################################################
+// Postgres
+//#############################################################################
+
 // Sync database structure
-func (database *Database) syncMysqlClearDatabase() {
+func (database *DatabasePostgres) syncClearDatabase() {
+
+	// don't use database which we're trying to drop, instead use "mysql"
+	schema := database.Local.Schema
+	database.Local.Schema = "postgres"
+
+	Logger.Step("dropping local database \"%s\"", schema)
+	dropStmt := fmt.Sprintf("DROP DATABASE IF EXISTS `%s`", schema)
+	dropCmd := shell.Cmd("echo", shell.Quote(dropStmt)).Pipe(database.localPsqlCmdBuilder()...)
+	dropCmd.Run()
+
+	Logger.Step("creating local database \"%s\"", schema)
+	createStmt := fmt.Sprintf("CREATE DATABASE `%s`", schema)
+	createCmd := shell.Cmd("echo", shell.Quote(createStmt)).Pipe(database.localPsqlCmdBuilder()...)
+	createCmd.Run()
+
+	database.Local.Schema = schema
+}
+
+// Sync database structure
+func (database *DatabasePostgres) syncStructure() {
+	Logger.Step("syncing database structure")
+
+	tmpfile, err := ioutil.TempFile("", "dump")
+	if err != nil {
+		panic(err)
+	}
+	defer os.Remove(tmpfile.Name())
+
+	// Sync structure only
+	dumpCmd := database.remotePgdumpCmdBuilder([]string{"--schema-only"}, false)
+	shell.Cmd(dumpCmd...).Pipe("cat", ">", tmpfile.Name()).Run()
+
+	// Restore structure only
+	restoreCmd := database.localPsqlCmdBuilder()
+	shell.Cmd("cat", tmpfile.Name()).Pipe("gunzip", "--stdout").Pipe(restoreCmd...).Run()
+}
+
+
+// Sync database data
+func (database *DatabasePostgres) syncData() {
+	Logger.Step("syncing database data")
+
+	tmpfile, err := ioutil.TempFile("", "dump")
+	if err != nil {
+		panic(err)
+	}
+	defer os.Remove(tmpfile.Name())
+
+	// Sync structure only
+	dumpCmd := database.remotePgdumpCmdBuilder([]string{"--data-only"}, true)
+	shell.Cmd(dumpCmd...).Pipe("cat", ">", tmpfile.Name()).Run()
+
+	// Restore structure only
+	restoreCmd := database.localPsqlCmdBuilder()
+	shell.Cmd("cat", tmpfile.Name()).Pipe("gunzip", "--stdout").Pipe(restoreCmd...).Run()
+}
+
+//#############################################################################
+// MySQL
+//#############################################################################
+
+// Sync database structure
+func (database *DatabaseMysql) syncClearDatabase() {
 
 	// don't use database which we're trying to drop, instead use "mysql"
 	schema := database.Local.Schema
@@ -42,7 +118,7 @@ func (database *Database) syncMysqlClearDatabase() {
 }
 
 // Sync database structure
-func (database *Database) syncMysqlStructure() {
+func (database *DatabaseMysql) syncStructure() {
 	Logger.Step("syncing database structure")
 
 	tmpfile, err := ioutil.TempFile("", "dump")
@@ -61,7 +137,7 @@ func (database *Database) syncMysqlStructure() {
 }
 
 // Sync database data
-func (database *Database) syncMysqlData() {
+func (database *DatabaseMysql) syncData() {
 	Logger.Step("syncing database data")
 
 	tmpfile, err := ioutil.TempFile("", "dump")

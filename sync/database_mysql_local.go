@@ -2,7 +2,7 @@ package sync
 
 import "github.com/webdevops/go-shell"
 
-func (database *Database) localMysqldumpCmdBuilder(additionalArgs []string, useFilter bool) []interface{} {
+func (database *DatabaseMysql) localMysqldumpCmdBuilder(additionalArgs []string, useFilter bool) []interface{} {
 	connection := database.Local.Connection.Clone()
 	var args []string
 
@@ -27,7 +27,7 @@ func (database *Database) localMysqldumpCmdBuilder(additionalArgs []string, useF
 	}
 
 	// exclude
-	excludeArgs, includeArgs := database.mysqlTableFilter(&database.Local.Connection, "local");
+	excludeArgs, includeArgs := database.tableFilter(&database.Local.Connection, "local");
 	if useFilter && len(excludeArgs) > 0 {
 		args = append(args, excludeArgs...)
 	}
@@ -48,7 +48,7 @@ func (database *Database) localMysqldumpCmdBuilder(additionalArgs []string, useF
 	return connection.RawCommandBuilder("mysqldump", args...)
 }
 
-func (database *Database) localMysqlCmdBuilder(args ...string) []interface{} {
+func (database *DatabaseMysql) localMysqlCmdBuilder(args ...string) []interface{} {
 	connection := database.Local.Connection.Clone()
 	args = append(args, "-BN")
 

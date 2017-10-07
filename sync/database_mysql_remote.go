@@ -5,7 +5,7 @@ import (
 	"github.com/webdevops/go-shell"
 )
 
-func (database *Database) remoteMysqldumpCmdBuilder(additionalArgs []string, useFilter bool) []interface{} {
+func (database *DatabaseMysql) remoteMysqldumpCmdBuilder(additionalArgs []string, useFilter bool) []interface{} {
 	connection := database.Connection.Clone()
 	var args []string
 
@@ -30,7 +30,7 @@ func (database *Database) remoteMysqldumpCmdBuilder(additionalArgs []string, use
 	}
 
 	// exclude
-	excludeArgs, includeArgs := database.mysqlTableFilter(&database.Connection, "remote");
+	excludeArgs, includeArgs := database.tableFilter(&database.Connection, "remote");
 	if useFilter && len(excludeArgs) > 0 {
 		args = append(args, excludeArgs...)
 	}
@@ -56,7 +56,7 @@ func (database *Database) remoteMysqldumpCmdBuilder(additionalArgs []string, use
 	return connection.RawShellCommandBuilder(cmd...)
 }
 
-func (database *Database) remoteMysqlCmdBuilder(args ...string) []interface{} {
+func (database *DatabaseMysql) remoteMysqlCmdBuilder(args ...string) []interface{} {
 	connection := database.Connection.Clone()
 	args = append(args, "-BN")
 
@@ -81,7 +81,7 @@ func (database *Database) remoteMysqlCmdBuilder(args ...string) []interface{} {
 	}
 
 	// append options in raw
-	if database.Options.Mysqldump != "" {
+	if database.Options.Mysql != "" {
 		args = append(args, database.Options.Mysql)
 	}
 
@@ -89,7 +89,7 @@ func (database *Database) remoteMysqlCmdBuilder(args ...string) []interface{} {
 }
 
 
-func (database *Database) remoteMysqlCmdBuilderUncompress(args ...string) []interface{} {
+func (database *DatabaseMysql) remoteMysqlCmdBuilderUncompress(args ...string) []interface{} {
 	connection := database.Connection.Clone()
 	args = append(args, "-BN")
 
@@ -110,7 +110,7 @@ func (database *Database) remoteMysqlCmdBuilderUncompress(args ...string) []inte
 	}
 
 	// add custom options (raw)
-	if database.Options.Mysqldump != "" {
+	if database.Options.Mysql != "" {
 		args = append(args, database.Options.Mysql)
 	}
 

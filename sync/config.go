@@ -29,6 +29,8 @@ type DatabaseOptions struct {
 	ClearDatabase bool `yaml:"clear-database"`
 	Mysqldump string
 	Mysql string
+	Pgdump string
+	Psql string
 }
 
 type EnvironmentVar struct {

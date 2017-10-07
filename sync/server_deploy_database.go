@@ -6,21 +6,24 @@ import (
 )
 
 func (database *Database) Deploy() {
-	switch database.Type {
+	switch database.GetType() {
 	case "mysql":
-		if database.Options.ClearDatabase {
-			database.deployMysqlClearDatabase()
+		mysql := database.GetMysql()
+		if mysql.Options.ClearDatabase {
+			mysql.deployClearDatabase()
 		}
 
-		database.deployMysqlStructure()
-		database.deployMysqlData()
-	default:
-		panic(fmt.Sprintf("Database type %s is not valid or supported", database.Type))
+		mysql.deployStructure()
+		mysql.deployData()
+
+	case "postgres":
+		postgres := database.GetPostgres()
+		fmt.Sprintf(postgres.String("deploy"))
 	}
 }
 
 // Deploy database structure
-func (database *Database) deployMysqlClearDatabase() {
+func (database *DatabaseMysql) deployClearDatabase() {
 
 	// don't use database which we're trying to drop, instead use "mysql"
 	schema := database.Schema
@@ -40,7 +43,7 @@ func (database *Database) deployMysqlClearDatabase() {
 }
 
 // Deploy database structure
-func (database *Database) deployMysqlStructure() {
+func (database *DatabaseMysql) deployStructure() {
 	Logger.Step("deploy database structure")
 
 	// Deploy structure only
@@ -52,7 +55,7 @@ func (database *Database) deployMysqlStructure() {
 }
 
 // Deploy database data
-func (database *Database) deployMysqlData() {
+func (database *DatabaseMysql) deployData() {
 	Logger.Step("deploy database data")
 
 	// Deploy data only

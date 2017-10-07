@@ -3,8 +3,6 @@ package sync
 import (
 	"fmt"
 	"strings"
-	"github.com/webdevops/go-shell"
-	"github.com/webdevops/go-shell/commandbuilder"
 )
 
 func (database *Database) ApplyDefaults(server *Server) {
@@ -14,52 +12,47 @@ func (database *Database) ApplyDefaults(server *Server) {
 	}
 }
 
-func (database *Database) mysqlTableFilter(connection *commandbuilder.Connection, connectionType string) ([]string, []string) {
-	var exclude []string
-	var include []string
+func (database *Database) GetType() string {
+	var dbtype string
 
-	var tableList []string
-
-	if (connectionType == "local") {
-		if len(database.cacheLocalTableList) == 0 {
-			Logger.Step("get list of mysql tables for table filter")
-			database.cacheLocalTableList = database.mysqlTableList(connectionType)
-		}
-
-		tableList = database.cacheLocalTableList
-	} else {
-		if len(database.cacheRemoteTableList) == 0 {
-			Logger.Step("get list of mysql tables for table filter")
-			database.cacheRemoteTableList = database.mysqlTableList(connectionType)
-		}
-
-		tableList = database.cacheRemoteTableList
+	switch database.Type {
+	case "mysql":
+		dbtype = "mysql"
+	case "postgresql":
+		fallthrough
+	case "postgres":
+		dbtype = "postgres"
+	default:
+		panic(fmt.Sprintf("Database type %s is not valid or supported", database.Type))
 	}
 
+	return dbtype
+}
 
-	// calc excludes
-	excludeTableList := database.Filter.CalcExcludes(tableList)
-	for _, table := range excludeTableList {
-		exclude  = append(exclude, shell.Quote(fmt.Sprintf("--ignore-table=%s.%s", database.Schema, table)))
-	}
+func (database *Database) GetMysql() DatabaseMysql {
+	return DatabaseMysql{*database}
+}
 
-	// calc includes
-	includeTableList := database.Filter.CalcIncludes(tableList)
-	for _, table := range includeTableList {
-		include  = append(include, table)
-	}
-
-	return exclude, include
+func (database *Database) GetPostgres() DatabasePostgres {
+	return DatabasePostgres{*database}
 }
 
 func (database *Database) String(direction string) string {
 	var parts, remote, local []string
 
+	// general
+	parts = append(parts, fmt.Sprintf("Type:%s", database.Type))
+
 	// remote
 	remote = append(remote, fmt.Sprintf("Schema:%s", database.Schema))
 
 	if database.Hostname != "" {
-		remote = append(remote, fmt.Sprintf("Host:%s", database.Hostname))
+		hostname := database.Hostname
+
+		if database.Port != "" {
+			hostname += ":"+database.Port
+		}
+		remote = append(remote, fmt.Sprintf("Host:%s", hostname))
 	}
 
 	if database.User != "" {
@@ -86,32 +79,4 @@ func (database *Database) String(direction string) string {
 	}
 
 	return fmt.Sprintf("Database[%s]", strings.Join(parts[:]," "))
-}
-
-func (database *Database) mysqlCommandBuilder(direction string, args ...string) []interface{} {
-	if direction == "local" {
-		return database.localMysqlCmdBuilder(args...)
-	} else {
-		return database.remoteMysqlCmdBuilder(args...)
-	}
-}
-
-func (database *Database) mysqldumpCommandBuilder(direction string, args ...string) []interface{} {
-	if direction == "local" {
-		return database.localMysqlCmdBuilder(args...)
-	} else {
-		return database.remoteMysqlCmdBuilder(args...)
-	}
-}
-
-func (database *Database) mysqlTableList(connectionType string) []string {
-	sqlStmt := "SHOW TABLES"
-
-	cmd := shell.Cmd("echo", sqlStmt).Pipe(database.mysqlCommandBuilder(connectionType)...)
-	output := cmd.Run().Stdout.String()
-
-	outputString := strings.TrimSpace(string(output))
-	ret := strings.Split(outputString, "\n")
-
-	return ret
 }
