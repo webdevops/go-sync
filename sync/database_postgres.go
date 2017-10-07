@@ -30,11 +30,11 @@ func (database *DatabasePostgres) init() {
 				// get superuser pass from env
 				if pass, ok := containerEnv["POSTGRES_PASSWORD"]; ok {
 					if user, ok := containerEnv["POSTGRES_USER"]; ok {
-						fmt.Println("   -> local: using postgres superadmin account (from POSTGRES_USER and POSTGRES_PASSWORD)")
+						fmt.Println(fmt.Sprintf("   -> local: using postgres superadmin account \"%s\" (from env:POSTGRES_USER and env:POSTGRES_PASSWORD)", user))
 						database.Local.User = user
 						database.Local.Password = pass
 					} else {
-						fmt.Println("   -> local: using postgres superadmin account (from POSTGRES_PASSWORD)")
+						fmt.Println("   -> local: using postgres superadmin account \"postgres\" (from env:POSTGRES_PASSWORD)")
 						// only password available
 						database.Local.User = "postgres"
 						database.Local.Password = pass
@@ -44,9 +44,9 @@ func (database *DatabasePostgres) init() {
 
 			// get schema from env
 			if database.Local.Schema == "" {
-				if val, ok := containerEnv["POSTGRES_DB"]; ok {
-					fmt.Println("   -> local: using postgres schema (from POSTGRES_DB)")
-					database.Local.Schema = val
+				if schema, ok := containerEnv["POSTGRES_DB"]; ok {
+					fmt.Println(fmt.Sprintf("   -> remote: using postgres schema \"%s\" (from env:POSTGRES_DB)", schema))
+					database.Local.Schema = schema
 				}
 			}
 		}
@@ -70,11 +70,11 @@ func (database *DatabasePostgres) init() {
 				// get superuser pass from env
 				if pass, ok := containerEnv["POSTGRES_PASSWORD"]; ok {
 					if user, ok := containerEnv["POSTGRES_USER"]; ok {
-						fmt.Println("   -> remote: using postgres superadmin account (from POSTGRES_USER and POSTGRES_PASSWORD)")
+						fmt.Println(fmt.Sprintf("   -> remote: using postgres superadmin account \"%s\" (from env:POSTGRES_USER and env:POSTGRES_PASSWORD)", user))
 						database.User = user
 						database.Password = pass
 					} else {
-						fmt.Println("   -> remote: using postgres superadmin account (from POSTGRES_PASSWORD)")
+						fmt.Println("   -> remote: using postgres superadmin account \"postgres\" (from env:POSTGRES_PASSWORD)")
 						// only password available
 						database.User = "postgres"
 						database.Password = pass
@@ -84,9 +84,9 @@ func (database *DatabasePostgres) init() {
 
 			// get schema from env
 			if database.Schema == "" {
-				if val, ok := containerEnv["POSTGRES_DB"]; ok {
-					fmt.Println("   -> remote: using postgres schema (from POSTGRES_DB)")
-					database.Schema = val
+				if schema, ok := containerEnv["POSTGRES_DB"]; ok {
+					fmt.Println(fmt.Sprintf("   -> remote: using postgres schema \"%s\" (from env:POSTGRES_DB)", schema))
+					database.Schema = schema
 				}
 			}
 		}
