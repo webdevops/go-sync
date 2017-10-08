@@ -49,8 +49,15 @@ func (database *Database) String(direction string) string {
 
 	// remote
 	remote = append(remote, fmt.Sprintf("Schema:%s", database.Schema))
+	remote = append(remote, fmt.Sprintf("Connection:%s", database.Connection.GetType()))
 
-	if database.Hostname != "" {
+	if database.Connection.SshConnectionHostnameString() != "" {
+		remote = append(remote, fmt.Sprintf("SSH:%s", database.Connection.SshConnectionHostnameString()))
+	}
+
+	if database.Connection.Docker != "" {
+		remote = append(remote, fmt.Sprintf("Docker:%s", database.Connection.Docker))
+	} else if database.Hostname != "" {
 		hostname := database.Hostname
 
 		if database.Port != "" {
@@ -69,6 +76,22 @@ func (database *Database) String(direction string) string {
 
 	// local
 	local = append(local, fmt.Sprintf("Schema:%s", database.Local.Schema))
+	local = append(local, fmt.Sprintf("Connection:%s", database.Local.Connection.GetType()))
+
+	if database.Local.Connection.SshConnectionHostnameString() != "" {
+		local = append(local, fmt.Sprintf("SSH:%s", database.Local.Connection.SshConnectionHostnameString()))
+	}
+
+	if database.Local.Connection.Docker != "" {
+		local = append(local, fmt.Sprintf("Docker:%s", database.Local.Connection.Docker))
+	} else if database.Local.Hostname != "" {
+		hostname := database.Local.Hostname
+
+		if database.Local.Port != "" {
+			hostname += ":"+database.Local.Port
+		}
+		local = append(local, fmt.Sprintf("Host:%s", hostname))
+	}
 
 	// build parts
 	switch direction {
