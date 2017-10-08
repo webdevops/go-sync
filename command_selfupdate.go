@@ -19,6 +19,16 @@ type SelfUpdateCommand struct {
 	Force  bool   `long:"force"  description:"force update"`
 }
 
+var (
+	selfUpdateOsTranslationMap = map[string]string{
+		"darwin": "osx",
+	}
+	selfUpdateArchTranslationMap = map[string]string{
+		"amd64": "x64",
+		"386":   "x32",
+	}
+)
+
 func (conf *SelfUpdateCommand) Execute(args []string) error {
 	fmt.Println("Starting self update")
 
@@ -39,18 +49,14 @@ func (conf *SelfUpdateCommand) Execute(args []string) error {
 
 	// translate OS names
 	os := runtime.GOOS
-	switch (runtime.GOOS) {
-	case "darwin":
-		os = "osx"
+	if val, ok := selfUpdateOsTranslationMap[os]; ok {
+		os = val
 	}
 
 	// translate arch names
 	arch := runtime.GOARCH
-	switch (arch) {
-	case "amd64":
-		arch = "x64"
-	case "386":
-		arch = "x32"
+	if val, ok := selfUpdateArchTranslationMap[arch]; ok {
+		arch = val
 	}
 
 	// build asset name
