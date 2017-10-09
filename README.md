@@ -36,7 +36,7 @@ Deployment:
 Install
 =======
 
-The binary file can be found in the [project releases](./releases/).
+The binary file can be found in the [project releases](https://github.com/webdevops/go-sync/releases).
 
 ```
 DOWNLOAD_VERSION=0.4.1
