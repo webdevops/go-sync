@@ -89,11 +89,18 @@ func main() {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println()
+
+			message := fmt.Sprintf("%v", r)
+
+			if obj, ok := r.(*shell.Process); ok {
+				message = obj.Debug()
+			}
+
 			if len(opts.Verbose) >= 2 {
-				fmt.Println(r)
+				fmt.Println(message)
 				debug.PrintStack()
 			} else {
-				fmt.Println(r)
+				fmt.Println(message)
 			}
 			os.Exit(255)
 		}
