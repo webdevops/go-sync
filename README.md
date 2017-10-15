@@ -117,20 +117,20 @@ container is used without lookup using eg. `docker-compose`.
 
 *CONTAINER* is the name of the docker-compose container.
 
-| DSN style configuration                                             | Description                                                                                            |
-|:--------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------|
-| ``compose:CONTAINER``                                               | Use container with docker-compose in current directory                                                 |
+| DSN style configuration                                             | Description                                                                                     |
+|:--------------------------------------------------------------------|:------------------------------------------------------------------------------------------------|
+| ``compose:CONTAINER``                                               | Use container with docker-compose in current directory                                          |
 | ``compose:CONTAINER;path=/path/to/project``                         | Use container with docker-compose in `/path/to/project` directory                               |
-| ``compose:CONTAINER;path=/path/to/project;file=custom-compose-yml`` | Use container with docker-compose in `/path/to/project` directory and `custom-compose.yml` file |
+| ``compose:CONTAINER;path=/path/to/project;file=custom-compose.yml`` | Use container with docker-compose in `/path/to/project` directory and `custom-compose.yml` file |
 | ``compose:CONTAINER;project-name=foobar``                           | Use container with docker-compose in current directory with project name `foobar`               |
 | ``compose:CONTAINER;host=example.com``                              | Use container with docker-compose in current directory with docker host `example.com`           |
 | ``compose:CONTAINER;env[FOOBAR]=BARFOO``                            | Use container with docker-compose in current directory with env var `FOOBAR` set to `BARFOO`    |
 
-| Query style configuration                                             | Description                                                                                            |
-|:----------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------|
+| Query style configuration                                             | Description                                                                                     |
+|:----------------------------------------------------------------------|:------------------------------------------------------------------------------------------------|
 | ``compose://CONTAINER``                                               | Use container with docker-compose in current directory                                          |
 | ``compose://CONTAINER?path=/path/to/project``                         | Use container with docker-compose in `/path/to/project` directory                               |
-| ``compose://CONTAINER?path=/path/to/project&file=custom-compose-yml`` | Use container with docker-compose in `/path/to/project` directory and `custom-compose.yml` file |
+| ``compose://CONTAINER?path=/path/to/project&file=custom-compose.yml`` | Use container with docker-compose in `/path/to/project` directory and `custom-compose.yml` file |
 | ``compose://CONTAINER?project-name=foobar``                           | Use container with docker-compose in current directory with project name `foobar`               |
 | ``compose://CONTAINER?host=example.com``                              | Use container with docker-compose in current directory with docker host `example.com`           |
 | ``compose://CONTAINER?env[FOOBAR]=BARFOO``                            | Use container with docker-compose in current directory with env var `FOOBAR` set to `BARFOO`    |
