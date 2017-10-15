@@ -4,7 +4,7 @@ GOBUILD = go build -ldflags '-w'
 
 ALL = \
 	$(foreach arch,x64 x32,\
-	$(foreach suffix,linux osx,\
+	$(foreach suffix,linux osx windows,\
 		build/gosync-$(suffix)-$(arch))) \
 	$(foreach arch,arm arm64,\
 		build/gosync-linux-$(arch))
