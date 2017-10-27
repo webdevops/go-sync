@@ -3,12 +3,13 @@ package sync
 import (
 	"fmt"
 	"strings"
+	"github.com/mohae/deepcopy"
 )
 
 func (filesystem *Filesystem) ApplyDefaults(server *Server) {
 	// set default connection if not set
 	if filesystem.Connection.IsEmpty() {
-		filesystem.Connection = server.Connection
+		filesystem.Connection = deepcopy.Copy(server.Connection).(YamlCommandBuilderConnection)
 	}
 
 	// set default path

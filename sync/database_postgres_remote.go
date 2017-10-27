@@ -6,7 +6,7 @@ import (
 )
 
 func (database *DatabasePostgres) remotePgdumpCmdBuilder(additionalArgs []string, useFilter bool) []interface{} {
-	connection := database.Connection.Clone()
+	connection := database.Connection.GetInstance().Clone()
 	var args []string
 
 	if database.User != "" {
@@ -57,7 +57,7 @@ func (database *DatabasePostgres) remotePgdumpCmdBuilder(additionalArgs []string
 }
 
 func (database *DatabasePostgres) remotePsqlCmdBuilder(args ...string) []interface{} {
-	connection := database.Connection.Clone()
+	connection := database.Connection.GetInstance().Clone()
 	args = append(args, "-t")
 
 	if database.User != "" {
@@ -90,7 +90,7 @@ func (database *DatabasePostgres) remotePsqlCmdBuilder(args ...string) []interfa
 
 
 func (database *DatabasePostgres) remotePsqlCmdBuilderUncompress(args ...string) []interface{} {
-	connection := database.Connection.Clone()
+	connection := database.Connection.GetInstance().Clone()
 	args = append(args, "-t")
 
 	if database.User != "" {

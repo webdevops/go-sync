@@ -9,13 +9,12 @@ import (
 	"path/filepath"
 	"github.com/webdevops/go-shell"
 	"github.com/webdevops/go-stubfilegenerator"
-	"github.com/webdevops/go-shell/commandbuilder"
 	"github.com/remeh/sizedwaitgroup"
 )
 
 // General sync
 func (filesystem *Filesystem) SyncStubs() {
-	switch filesystem.Connection.GetType() {
+	switch filesystem.Connection.GetInstance().GetType() {
 	case "local":
 		fallthrough
 	case "ssh":
@@ -27,11 +26,9 @@ func (filesystem *Filesystem) SyncStubs() {
 
 // Sync filesystem using rsync
 func (filesystem *Filesystem) generateStubs() {
-	conn := commandbuilder.Connection{}
-	conn.Hostname = "foobar"
-	conn.User = "itops"
+	connection := filesystem.Connection.GetInstance()
 
-	cmd := shell.Cmd(filesystem.Connection.CommandBuilder("find", filesystem.Path, "-type", "f")...)
+	cmd := shell.Cmd(connection.CommandBuilder("find", filesystem.Path, "-type", "f")...)
 	output := cmd.Run().Stdout.String()
 
 	removeBasePath := filesystem.Path

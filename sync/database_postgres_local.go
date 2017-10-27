@@ -3,7 +3,7 @@ package sync
 import "github.com/webdevops/go-shell"
 
 func (database *DatabasePostgres) localPgdumpCmdBuilder(additionalArgs []string, useFilter bool) []interface{} {
-	connection := database.Local.Connection.Clone()
+	connection := database.Local.Connection.GetInstance().Clone()
 	var args []string
 
 	if database.Local.User != "" {
@@ -49,7 +49,7 @@ func (database *DatabasePostgres) localPgdumpCmdBuilder(additionalArgs []string,
 }
 
 func (database *DatabasePostgres) localPsqlCmdBuilder(args ...string) []interface{} {
-	connection := database.Local.Connection.Clone()
+	connection := database.Local.Connection.GetInstance().Clone()
 	args = append(args, "-t")
 
 	if database.Local.User != "" {

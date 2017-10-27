@@ -19,7 +19,7 @@ func (command *DeployCommand) Execute(args []string) error {
 		Logger.FatalErrorExit(3, err)
 	}
 	Logger.Step("using Server[%s]", server)
-	Logger.Step("using %s", confServer.Connection.String())
+	Logger.Step("using %s", confServer.Connection.GetInstance().String())
 
 	// --dump
 	if command.Dump {

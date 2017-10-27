@@ -9,7 +9,7 @@ import (
 
 // General sync
 func (filesystem *Filesystem) Sync() {
-	switch filesystem.Connection.GetType() {
+	switch filesystem.Connection.GetInstance().GetType() {
 	case "local":
 		fallthrough
 	case "ssh":
@@ -21,6 +21,8 @@ func (filesystem *Filesystem) Sync() {
 
 // Sync filesystem using rsync
 func (filesystem *Filesystem) syncRsync() {
+	connection := filesystem.Connection.GetInstance()
+
 	args := []string{"-rlptD", "--delete-after", "--progress", "--human-readable"}
 
 	// include filter
@@ -43,9 +45,9 @@ func (filesystem *Filesystem) syncRsync() {
 
 	// build source and target paths
 	sourcePath := ""
-	switch filesystem.Connection.GetType() {
+	switch connection.GetType() {
 	case "ssh":
-		sourcePath = fmt.Sprintf("%s:%s", filesystem.Connection.SshConnectionHostnameString(), filesystem.Path)
+		sourcePath = fmt.Sprintf("%s:%s", connection.SshConnectionHostnameString(), filesystem.Path)
 	case "local":
 		sourcePath = filesystem.Path
 	}

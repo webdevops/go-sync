@@ -3,8 +3,9 @@ package sync
 import "github.com/webdevops/go-shell"
 
 func (database *DatabaseMysql) localMysqldumpCmdBuilder(additionalArgs []string, useFilter bool) []interface{} {
-	connection := database.Local.Connection.Clone()
 	var args []string
+
+	connection := database.Local.Connection.GetInstance().Clone()
 
 	if database.Local.User != "" {
 		args = append(args, shell.Quote("-u" + database.Local.User))
@@ -49,7 +50,8 @@ func (database *DatabaseMysql) localMysqldumpCmdBuilder(additionalArgs []string,
 }
 
 func (database *DatabaseMysql) localMysqlCmdBuilder(args ...string) []interface{} {
-	connection := database.Local.Connection.Clone()
+	connection := database.Local.Connection.GetInstance().Clone()
+
 	args = append(args, "-BN")
 
 	if database.Local.User != "" {

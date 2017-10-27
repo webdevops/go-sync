@@ -35,12 +35,12 @@ func (execution *Execution) commandBuilder(server *Server) []interface{} {
 	case "local":
 		connection = commandbuilder.Connection{Type:"local"}
 	case "remote":
-		connection = server.Connection.Clone()
+		connection = *(server.Connection.GetInstance().Clone())
 	}
 
 	// set working directory
 	if execution.Workdir != "" {
-		connection.WorkDir = execution.Workdir
+		connection.Workdir = execution.Workdir
 	}
 
 	// set environment

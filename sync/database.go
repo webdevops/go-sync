@@ -3,12 +3,13 @@ package sync
 import (
 	"fmt"
 	"strings"
+	"github.com/mohae/deepcopy"
 )
 
 func (database *Database) ApplyDefaults(server *Server) {
 	// set default connection if not set
 	if database.Connection.IsEmpty() {
-		database.Connection = server.Connection
+		database.Connection = deepcopy.Copy(server.Connection).(YamlCommandBuilderConnection)
 	}
 }
 
@@ -43,20 +44,26 @@ func (database *Database) GetPostgres() DatabasePostgres {
 
 func (database *Database) String(direction string) string {
 	var parts, remote, local []string
+	
+	connRemote := database.Connection.GetInstance()
+	connLocal := database.Local.Connection.GetInstance()
 
 	// general
 	parts = append(parts, fmt.Sprintf("Type:%s", database.Type))
 
+	//-------------------------------------------
 	// remote
 	remote = append(remote, fmt.Sprintf("Schema:%s", database.Schema))
-	remote = append(remote, fmt.Sprintf("Connection:%s", database.Connection.GetType()))
+	remote = append(remote, fmt.Sprintf("Connection:%s", connRemote.GetType()))
 
-	if database.Connection.SshConnectionHostnameString() != "" {
-		remote = append(remote, fmt.Sprintf("SSH:%s", database.Connection.SshConnectionHostnameString()))
+	if connRemote.IsSsh() {
+		if connRemote.SshConnectionHostnameString() != "" {
+			remote = append(remote, fmt.Sprintf("SSH:%s", connRemote.SshConnectionHostnameString()))
+		}
 	}
 
-	if database.Connection.Docker != "" {
-		remote = append(remote, fmt.Sprintf("Docker:%s", database.Connection.Docker))
+	if connRemote.IsDocker() {
+		remote = append(remote, fmt.Sprintf("Docker:%s", connRemote.Docker))
 	} else if database.Hostname != "" {
 		hostname := database.Hostname
 
@@ -74,16 +81,19 @@ func (database *Database) String(direction string) string {
 		remote = append(remote, fmt.Sprintf("Passwd:%s", "*****"))
 	}
 
+	//-------------------------------------------
 	// local
 	local = append(local, fmt.Sprintf("Schema:%s", database.Local.Schema))
-	local = append(local, fmt.Sprintf("Connection:%s", database.Local.Connection.GetType()))
+	local = append(local, fmt.Sprintf("Connection:%s", connLocal.GetType()))
 
-	if database.Local.Connection.SshConnectionHostnameString() != "" {
-		local = append(local, fmt.Sprintf("SSH:%s", database.Local.Connection.SshConnectionHostnameString()))
+	if connLocal.IsSsh() {
+		if connLocal.SshConnectionHostnameString() != "" {
+			local = append(local, fmt.Sprintf("SSH:%s", connLocal.SshConnectionHostnameString()))
+		}
 	}
 
-	if database.Local.Connection.Docker != "" {
-		local = append(local, fmt.Sprintf("Docker:%s", database.Local.Connection.Docker))
+	if connLocal.IsDocker() {
+		local = append(local, fmt.Sprintf("Docker:%s", connLocal.Docker))
 	} else if database.Local.Hostname != "" {
 		hostname := database.Local.Hostname
 

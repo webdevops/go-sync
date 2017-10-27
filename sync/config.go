@@ -3,7 +3,6 @@ package sync
 import (
 	"regexp"
 	"sync"
-	"github.com/webdevops/go-shell/commandbuilder"
 )
 
 var waitGroup sync.WaitGroup
@@ -19,7 +18,7 @@ type Filesystem struct {
 	Path string
 	Local string
 	Filter Filter
-	Connection commandbuilder.Connection
+	Connection YamlCommandBuilderConnection
 	Options struct {
 		GenerateStubs bool `yaml:"generate-stubs"`
 	}
@@ -47,7 +46,7 @@ type Database struct {
 	Password string
 
 	Filter Filter
-	Connection commandbuilder.Connection
+	Connection YamlCommandBuilderConnection
 
 	Local struct {
 		Type string
@@ -57,7 +56,7 @@ type Database struct {
 		User string
 		Password string
 
-		Connection commandbuilder.Connection
+		Connection YamlCommandBuilderConnection
 		Options DatabaseOptions
 	}
 	Options DatabaseOptions
@@ -78,7 +77,7 @@ type Execution struct {
 
 type Server struct {
 	Path string
-	Connection commandbuilder.Connection
+	Connection YamlCommandBuilderConnection
 	Filesystem []Filesystem
 	Database []Database
 	ExecStartup []Execution `yaml:"exec-startup"`

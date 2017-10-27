@@ -11,18 +11,13 @@ type DatabaseMysql struct {
 }
 
 func (database *DatabaseMysql) init() {
+	connLocal := database.Local.Connection.GetInstance()
+	connRemote := database.Connection.GetInstance()
+	
 	// LOCAL
-	if database.Local.Connection.Docker != "" {
-		queryConn := database.Local.Connection.Clone()
-		queryConn.Type = "auto"
-		queryConn.Docker = ""
-
-		// docker auto hostname
-		database.Local.Hostname = "127.0.0.1"
-
+	if connLocal.IsDocker() {
 		if database.Local.User == "" || database.Local.Schema == "" {
-			containerId := queryConn.DockerGetContainerId(database.Local.Connection.Docker)
-			containerEnv := queryConn.DockerGetEnvironment(containerId)
+			containerEnv := connLocal.DockerGetEnvironment()
 
 			// try to guess user/password
 			if database.Local.User == "" {
@@ -62,17 +57,9 @@ func (database *DatabaseMysql) init() {
 	}
 
 	// Remote
-	if database.Connection.Docker != "" {
-		queryConn := database.Connection.Clone()
-		queryConn.Type = "auto"
-		queryConn.Docker = ""
-
-		// docker auto hostname
-		database.Hostname = "127.0.0.1"
-
+	if connRemote.IsDocker() {
 		if database.User == "" || database.Schema == "" {
-			containerId := queryConn.DockerGetContainerId(database.Connection.Docker)
-			containerEnv := queryConn.DockerGetEnvironment(containerId)
+			containerEnv := connRemote.DockerGetEnvironment()
 
 			// try to guess user/password
 			if database.User == "" {
@@ -118,7 +105,7 @@ func (database *DatabaseMysql) tableFilter(connectionType string) ([]string, []s
 
 	var tableList []string
 
-	if (connectionType == "local") {
+	if connectionType == "local" {
 		if len(database.cacheLocalTableList) == 0 {
 			Logger.Step("get list of mysql tables for table filter")
 			database.cacheLocalTableList = database.tableList(connectionType)

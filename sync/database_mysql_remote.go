@@ -6,8 +6,9 @@ import (
 )
 
 func (database *DatabaseMysql) remoteMysqldumpCmdBuilder(additionalArgs []string, useFilter bool) []interface{} {
-	connection := database.Connection.Clone()
 	var args []string
+
+	connection := database.Connection.GetInstance().Clone()
 
 	if database.User != "" {
 		args = append(args, shell.Quote("-u" + database.User))
@@ -57,7 +58,8 @@ func (database *DatabaseMysql) remoteMysqldumpCmdBuilder(additionalArgs []string
 }
 
 func (database *DatabaseMysql) remoteMysqlCmdBuilder(args ...string) []interface{} {
-	connection := database.Connection.Clone()
+	connection := database.Connection.GetInstance().Clone()
+
 	args = append(args, "-BN")
 
 	if database.User != "" {
@@ -90,7 +92,8 @@ func (database *DatabaseMysql) remoteMysqlCmdBuilder(args ...string) []interface
 
 
 func (database *DatabaseMysql) remoteMysqlCmdBuilderUncompress(args ...string) []interface{} {
-	connection := database.Connection.Clone()
+	connection := database.Connection.GetInstance().Clone()
+
 	args = append(args, "-BN")
 
 	if database.User != "" {
