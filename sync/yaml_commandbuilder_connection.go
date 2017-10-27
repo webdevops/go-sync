@@ -8,16 +8,21 @@ type YamlCommandBuilderConnection struct {
 	Type string
 	Ssh YamlCommandBuilderArgument
 	Docker YamlCommandBuilderArgument
+
+	connection *commandbuilder.Connection
 }
 
 func (yconn *YamlCommandBuilderConnection) GetInstance() *commandbuilder.Connection {
-	conn := commandbuilder.Connection{}
-	conn.Type = yconn.Type
+	if yconn.connection == nil {
+		conn := commandbuilder.Connection{}
+		conn.Type = yconn.Type
+		conn.Ssh = yconn.Ssh.Argument
+		conn.Docker = yconn.Docker.Argument
 
-	conn.Ssh = yconn.Ssh.Argument
-	conn.Docker = yconn.Docker.Argument
+		yconn.connection = &conn
+	}
 
-	return &conn
+	return yconn.connection
 }
 
 func (yconn *YamlCommandBuilderConnection) IsEmpty() bool {
