@@ -63,7 +63,7 @@ func (database *Database) String(direction string) string {
 	}
 
 	if connRemote.IsDocker() {
-		remote = append(remote, fmt.Sprintf("Docker:%s", connRemote.Docker))
+		remote = append(remote, fmt.Sprintf("Docker:%s", connRemote.Docker.Hostname))
 	} else if database.Hostname != "" {
 		hostname := database.Hostname
 
@@ -93,7 +93,7 @@ func (database *Database) String(direction string) string {
 	}
 
 	if connLocal.IsDocker() {
-		local = append(local, fmt.Sprintf("Docker:%s", connLocal.Docker))
+		local = append(local, fmt.Sprintf("Docker:%s", connLocal.Docker.Hostname))
 	} else if database.Local.Hostname != "" {
 		hostname := database.Local.Hostname
 
