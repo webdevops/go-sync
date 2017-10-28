@@ -10,9 +10,7 @@ sync:
     path: "./test/"
 
     connection:
-      type: ssh
-      hostname: example.com
-      user: ssh-user
+      ssh: user@example.com
 
     #########################
     ## Filesystem rsync
@@ -174,9 +172,7 @@ deploy:
     path: "./test/"
 
     connection:
-      type: ssh
-      hostname: example.com
-      user: ssh-user
+      ssh: user@example.com
 
     filesystem:
     - path: /tmp/path
@@ -206,8 +202,7 @@ deploy:
           password: dev
           connection:
             docker: compose:mysql
-            user: root
-            password: dev
+            ssh: foo@example.com
         options:
           clear-database: true
 
