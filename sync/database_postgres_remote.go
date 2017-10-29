@@ -14,7 +14,7 @@ func (database *DatabasePostgres) remotePgdumpCmdBuilder(additionalArgs []string
 	}
 
 	if database.Password != "" {
-		connection.Environment["PGPASSWORD"] = database.Password
+		connection.Environment.Set("PGPASSWORD", database.Password)
 	}
 
 	if database.Hostname != "" {
@@ -65,7 +65,7 @@ func (database *DatabasePostgres) remotePsqlCmdBuilder(args ...string) []interfa
 	}
 
 	if database.Password != "" {
-		connection.Environment["PGPASSWORD"] = database.Password
+		connection.Environment.Set("PGPASSWORD", database.Password)
 	}
 
 	if database.Hostname != "" {
@@ -98,7 +98,7 @@ func (database *DatabasePostgres) remotePsqlCmdBuilderUncompress(args ...string)
 	}
 
 	if database.Password != "" {
-		connection.Environment["MYSQL_PWD"] = database.Password
+		connection.Environment.Set("MYSQL_PWD", database.Password)
 	}
 
 	if database.Hostname != "" {

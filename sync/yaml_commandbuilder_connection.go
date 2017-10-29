@@ -6,18 +6,37 @@ import (
 
 type YamlCommandBuilderConnection struct {
 	Type string
-	Ssh YamlCommandBuilderArgument
-	Docker YamlCommandBuilderArgument
+	Ssh *YamlCommandBuilderArgument
+	Docker *YamlCommandBuilderArgument
+
+	Environment *map[string]string
+	Workdir string
 
 	connection *commandbuilder.Connection
 }
 
+// Get (or create) connection instance
+// will be cached one it's created
 func (yconn *YamlCommandBuilderConnection) GetInstance() *commandbuilder.Connection {
 	if yconn.connection == nil {
 		conn := commandbuilder.Connection{}
 		conn.Type = yconn.Type
-		conn.Ssh = yconn.Ssh.Argument
-		conn.Docker = yconn.Docker.Argument
+
+		if yconn.Ssh != nil {
+			conn.Ssh = yconn.Ssh.Argument
+		}
+
+		if yconn.Docker != nil {
+			conn.Docker = yconn.Docker.Argument
+		}
+
+		if yconn.Environment != nil {
+			conn.Environment.SetMap(*yconn.Environment)
+		}
+
+		if yconn.Workdir != "" {
+			conn.Workdir = yconn.Workdir
+		}
 
 		yconn.connection = &conn
 	}
@@ -25,6 +44,13 @@ func (yconn *YamlCommandBuilderConnection) GetInstance() *commandbuilder.Connect
 	return yconn.connection
 }
 
-func (yconn *YamlCommandBuilderConnection) IsEmpty() bool {
-	return yconn.Type == "" && yconn.Docker.IsEmpty() && yconn.Ssh.IsEmpty()
+// Checks if connection is empty
+func (yconn *YamlCommandBuilderConnection) IsEmpty() (status bool) {
+	status = false
+	if yconn.Type != ""    { return }
+	if yconn.Ssh != nil    { return }
+	if yconn.Docker != nil { return }
+	if yconn.Environment != nil { return }
+
+	return true
 }

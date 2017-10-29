@@ -11,7 +11,7 @@ func (database *DatabasePostgres) localPgdumpCmdBuilder(additionalArgs []string,
 	}
 
 	if database.Local.Password != "" {
-		connection.Environment["PGPASSWORD"] = database.Local.Password
+		connection.Environment.Set("PGPASSWORD", database.Local.Password)
 	}
 
 	if database.Local.Hostname != "" {
@@ -57,7 +57,7 @@ func (database *DatabasePostgres) localPsqlCmdBuilder(args ...string) []interfac
 	}
 
 	if database.Local.Password != "" {
-		connection.Environment["PGPASSWORD"] = database.Local.Password
+		connection.Environment.Set("PGPASSWORD", database.Local.Password)
 	}
 
 	if database.Local.Hostname != "" {

@@ -89,6 +89,7 @@ func main() {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println()
+			fmt.Println("PANIC CATCHED")
 
 			message := fmt.Sprintf("%v", r)
 

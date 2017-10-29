@@ -1,6 +1,8 @@
 package sync
 
-import "strings"
+import (
+	"strings"
+)
 
 type YamlStringArray struct {
 	Multi  []string
@@ -10,15 +12,15 @@ type YamlStringArray struct {
 func (ysa *YamlStringArray) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var multi []string
 	err := unmarshal(&multi)
-	if err != nil {
+	if err == nil {
+		ysa.Multi = multi
+	} else {
 		var single string
 		err := unmarshal(&single)
 		if err != nil {
 			return err
 		}
 		ysa.Single = single
-	} else {
-		ysa.Multi = multi
 	}
 	return nil
 }
@@ -35,12 +37,12 @@ func (ysa *YamlStringArray) ToString(sep string) string {
 	}
 }
 
-func (ysa *YamlStringArray) Array() []string {
+func (ysa *YamlStringArray) Array() (command []string) {
 	if len(ysa.Multi) >= 1 {
-		return ysa.Multi
+		command = ysa.Multi
 	} else if ysa.Single != "" {
-		return []string{ysa.Single}
-	} else {
-		return []string{}
+		command = []string{ysa.Single}
 	}
+
+	return
 }

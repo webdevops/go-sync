@@ -3,19 +3,16 @@ package sync
 import (
 	"fmt"
 	"strings"
-	"github.com/mohae/deepcopy"
 )
 
 func (database *Database) ApplyDefaults(server *Server) {
 	// set default connection if not set
-	if database.Connection.IsEmpty() {
-		database.Connection = deepcopy.Copy(server.Connection).(YamlCommandBuilderConnection)
+	if database.Connection == nil {
+		*database.Connection = *server.Connection
 	}
 }
 
-func (database *Database) GetType() string {
-	var dbtype string
-
+func (database *Database) GetType() (dbtype string) {
 	switch database.Type {
 	case "mysql":
 		dbtype = "mysql"

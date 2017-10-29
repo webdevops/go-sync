@@ -99,10 +99,7 @@ func (database *DatabaseMysql) init() {
 	}
 }
 
-func (database *DatabaseMysql) tableFilter(connectionType string) ([]string, []string) {
-	var exclude []string
-	var include []string
-
+func (database *DatabaseMysql) tableFilter(connectionType string) (exclude []string, include []string) {
 	var tableList []string
 
 	if connectionType == "local" {

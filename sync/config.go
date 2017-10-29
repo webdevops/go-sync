@@ -8,58 +8,58 @@ import (
 var waitGroup sync.WaitGroup
 
 type Filter struct {
-	Exclude []string
+	Exclude []string `yaml:"exclude"`
 	excludeRegexp []*regexp.Regexp
-	Include []string
+	Include []string `yaml:"include"`
 	includeRegexp []*regexp.Regexp
 }
 
 type Filesystem struct {
-	Path string
-	Local string
-	Filter Filter
-	Connection YamlCommandBuilderConnection
+	Path string `yaml:"path"`
+	Local string `yaml:"local"`
+	Filter Filter `yaml:"filter"`
+	Connection *YamlCommandBuilderConnection `yaml:"connection"`
 	Options struct {
 		GenerateStubs bool `yaml:"generate-stubs"`
-	}
+	} `yaml:"options"`
 }
 
 type DatabaseOptions struct {
 	ClearDatabase bool `yaml:"clear-database"`
-	Mysqldump string
-	Mysql string
-	Pgdump string
-	Psql string
+	Mysqldump string `yaml:"mysqldump"`
+	Mysql string `yaml:"mysql"`
+	Pgdump string `yaml:"pgdump"`
+	Psql string `yaml:"psql"`
 }
 
 type EnvironmentVar struct {
-	Name string
-	Value string
+	Name string `yaml:"name"`
+	Value string `yaml:"value"`
 }
 
 type Database struct {
-	Type string
-	Schema string
-	Hostname string
-	Port string
-	User string
-	Password string
+	Type string `yaml:"type"`
+	Schema string `yaml:"schema"`
+	Hostname string `yaml:"hostname"`
+	Port string `yaml:"port"`
+	User string `yaml:"user"`
+	Password string `yaml:"password"`
 
-	Filter Filter
-	Connection YamlCommandBuilderConnection
+	Filter Filter `yaml:"filter"`
+	Connection *YamlCommandBuilderConnection `yaml:"connection"`
+	Options DatabaseOptions `yaml:"options"`
 
 	Local struct {
-		Type string
-		Schema string
-		Hostname string
-		Port string
-		User string
-		Password string
+		Type string `yaml:"type"`
+		Schema string `yaml:"schema"`
+		Hostname string `yaml:"hostname"`
+		Port string `yaml:"port"`
+		User string `yaml:"user"`
+		Password string `yaml:"password"`
 
-		Connection YamlCommandBuilderConnection
-		Options DatabaseOptions
-	}
-	Options DatabaseOptions
+		Connection *YamlCommandBuilderConnection `yaml:"connection"`
+		Options DatabaseOptions `yaml:"options"`
+	} `yaml:"local"`
 
 	// local cache
 	cacheRemoteTableList []string
@@ -67,24 +67,24 @@ type Database struct {
 }
 
 type Execution struct {
-	Type string
-	Command YamlStringArray
-	Workdir string
-	Environment []EnvironmentVar
+	Type string `yaml:"type"`
+	Command YamlStringArray `yaml:"command"`
+	Workdir string `yaml:"workdir"`
+	Environment []EnvironmentVar `yaml:"environment"`
 	Options struct {
-	}
+	} `yaml:"options"`
 }
 
 type Server struct {
-	Path string
-	Connection YamlCommandBuilderConnection
-	Filesystem []Filesystem
-	Database []Database
+	Path string `yaml:"path"`
+	Connection *YamlCommandBuilderConnection `yaml:"connection"`
+	Filesystem []Filesystem `yaml:"filesystem"`
+	Database []Database `yaml:"database"`
 	ExecStartup []Execution `yaml:"exec-startup"`
 	ExecFinish []Execution `yaml:"exec-finish"`
 }
 
 type SyncConfig struct {
-	Sync map[string]Server
-	Deploy map[string]Server
+	Sync map[string]Server `yaml:"sync"`
+	Deploy map[string]Server `yaml:"deploy"`
 }

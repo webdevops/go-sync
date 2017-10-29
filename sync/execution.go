@@ -28,6 +28,7 @@ func (execution *Execution) Execute(server *Server) {
 	Logger.Verbose(run.Stdout.String())
 }
 
+// Create commandBuilder for execution
 func (execution *Execution) commandBuilder(server *Server) []interface{} {
 	var connection commandbuilder.Connection
 
@@ -44,9 +45,9 @@ func (execution *Execution) commandBuilder(server *Server) []interface{} {
 	}
 
 	// set environment
-	connection.Environment = map[string]string{}
+	connection.Environment.Clear()
 	for _, val := range execution.Environment {
-		connection.Environment[val.Name] = val.Value
+		connection.Environment.Set(val.Name, val.Value)
 	}
 
 	if len(execution.Command.Multi) >= 1 {
@@ -58,19 +59,18 @@ func (execution *Execution) commandBuilder(server *Server) []interface{} {
 	}
 }
 
-func (execution *Execution) GetType() string {
-	var ret string
-
+// Get execution type (local or remote)
+func (execution *Execution) GetType() (execType string) {
 	switch strings.ToLower(execution.Type) {
 	case "":
 		fallthrough
 	case "local":
-		ret = "local"
+		execType = "local"
 	case "remote":
-		ret = "remote"
+		execType = "remote"
 	default:
 		panic(execution)
 	}
 
-	return ret
+	return
 }

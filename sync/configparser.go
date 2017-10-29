@@ -24,11 +24,7 @@ databaseExcludeTYPO3:
 ---
 `
 
-
-
-func NewConfigParser(file string) *SyncConfig {
-	config := SyncConfig{}
-
+func NewConfigParser(file string) (config *SyncConfig) {
 	ymlData, err := ioutil.ReadFile(file)
 	if err != nil {
 		Logger.FatalErrorExit(1, err)
@@ -41,7 +37,7 @@ func NewConfigParser(file string) *SyncConfig {
 		Logger.FatalErrorExit(1, err)
 	}
 
-	return &config
+	return
 }
 
 func (config *SyncConfig) GetSyncServer(serverName string) (Server, error) {
@@ -60,42 +56,38 @@ func (config *SyncConfig) GetDeployServer(serverName string) (Server, error) {
 	}
 }
 
-func (config *SyncConfig) GetServerList(confType string) []string {
-	ret := []string{}
-
+func (config *SyncConfig) GetServerList(confType string) (list []string) {
 	switch confType {
 	case "sync":
 		for key := range config.Sync {
-			ret = append(ret, key)
+			list = append(list, key)
 		}
 	case "deploy":
 		for key := range config.Deploy {
-			ret = append(ret, key)
+			list = append(list, key)
 		}
 	}
 
-	return ret
+	return
 }
 
 // List all possible server configurations
-func (config *SyncConfig) ListServer() map[string][]string {
-	ret := map[string][]string{}
-
+func (config *SyncConfig) ListServer() (list map[string][]string) {
 	if len(config.Sync) > 0 {
-		ret["Sync"] = make([]string, len(config.Sync)-1)
+		list["Sync"] = make([]string, len(config.Sync)-1)
 		for key := range config.Sync {
-			ret["Sync"] = append(ret["Sync"], key)
+			list["Sync"] = append(list["Sync"], key)
 		}
 	}
 
 	if len(config.Deploy) > 0 {
-		ret["Deploy"] = make([]string, len(config.Deploy)-1)
+		list["Deploy"] = make([]string, len(config.Deploy)-1)
 		for key := range config.Deploy {
-			ret["Deploy"] = append(ret["Deploy"], key)
+			list["Deploy"] = append(list["Deploy"], key)
 		}
 	}
 
-	return ret
+	return
 }
 
 // Show all possible server configurations

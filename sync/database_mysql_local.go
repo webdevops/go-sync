@@ -1,6 +1,8 @@
 package sync
 
-import "github.com/webdevops/go-shell"
+import (
+	"github.com/webdevops/go-shell"
+)
 
 func (database *DatabaseMysql) localMysqldumpCmdBuilder(additionalArgs []string, useFilter bool) []interface{} {
 	var args []string
@@ -12,7 +14,7 @@ func (database *DatabaseMysql) localMysqldumpCmdBuilder(additionalArgs []string,
 	}
 
 	if database.Local.Password != "" {
-		connection.Environment["MYSQL_PWD"] = database.Local.Password
+		connection.Environment.Set("MYSQL_PWD", database.Local.Password)
 	}
 
 	if database.Local.Hostname != "" {
@@ -59,7 +61,7 @@ func (database *DatabaseMysql) localMysqlCmdBuilder(args ...string) []interface{
 	}
 
 	if database.Local.Password != "" {
-		connection.Environment["MYSQL_PWD"] = database.Local.Password
+		connection.Environment.Set("MYSQL_PWD", database.Local.Password)
 	}
 
 	if database.Local.Hostname != "" {

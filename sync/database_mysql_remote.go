@@ -15,7 +15,7 @@ func (database *DatabaseMysql) remoteMysqldumpCmdBuilder(additionalArgs []string
 	}
 
 	if database.Password != "" {
-		connection.Environment["MYSQL_PWD"] = database.Password
+		connection.Environment.Set("MYSQL_PWD", database.Password)
 	}
 
 	if database.Hostname != "" {
@@ -67,7 +67,7 @@ func (database *DatabaseMysql) remoteMysqlCmdBuilder(args ...string) []interface
 	}
 
 	if database.Password != "" {
-		connection.Environment["MYSQL_PWD"] = database.Password
+		connection.Environment.Set("MYSQL_PWD", database.Password)
 	}
 
 	if database.Hostname != "" {
@@ -101,7 +101,7 @@ func (database *DatabaseMysql) remoteMysqlCmdBuilderUncompress(args ...string) [
 	}
 
 	if database.Password != "" {
-		connection.Environment["MYSQL_PWD"] = database.Password
+		connection.Environment.Set("MYSQL_PWD", database.Password)
 	}
 
 	if database.Hostname != "" {

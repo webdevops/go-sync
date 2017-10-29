@@ -4,6 +4,7 @@ import (
 	"regexp"
 )
 
+// Compile filter regexp (and cache them)
 func (filter *Filter) compile() {
 	if len(filter.excludeRegexp) == 0 {
 		filter.excludeRegexp = make([]*regexp.Regexp, len(filter.Exclude))
@@ -20,6 +21,7 @@ func (filter *Filter) compile() {
 	}
 }
 
+// Apply filter (exclude/include) and get filtered list
 func (filter *Filter) ApplyFilter(lines []string) []string {
 	filter.compile()
 
@@ -43,36 +45,40 @@ func (filter *Filter) ApplyFilter(lines []string) []string {
 	return lines
 }
 
-
+// Apply exclude filter only and get filtered excludes
 func (filter *Filter) CalcExcludes(lines []string) []string {
 	filter.compile()
 	return filter.calculateMatching(filter.excludeRegexp, lines)
 }
 
+// Apply includes filter only and get filtered includes
 func (filter *Filter) CalcIncludes(lines []string) []string {
 	filter.compile()
 	return filter.calculateMatching(filter.includeRegexp, lines)
 }
 
-func (filter *Filter) calculateMatching(regexpList []*regexp.Regexp, lines []string) []string {
-	var ret []string
-
+// Calculate matches using regexp array
+func (filter *Filter) calculateMatching(regexpList []*regexp.Regexp, lines []string) (matches []string) {
 	for _, filterRegexp := range regexpList {
 		for _, value := range lines {
 			if filterRegexp.MatchString(value) == true {
-				ret = append(ret, value)
+				matches = append(matches, value)
 			}
 		}
 	}
 
-	return ret
+	return
 }
 
-func stringInSlice(a string, list []string) bool {
+// check if string exists in slice
+func stringInSlice(a string, list []string) (status bool) {
+	status = false
+
 	for _, b := range list {
 		if b == a {
-			return true
+			status = true
+			return
 		}
 	}
-	return false
+	return
 }

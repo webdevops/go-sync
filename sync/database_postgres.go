@@ -10,11 +10,9 @@ type DatabasePostgres struct {
 	Database
 }
 
-
 func (database *DatabasePostgres) init() {
 	connLocal := database.Local.Connection.GetInstance()
 	connRemote := database.Connection.GetInstance()
-
 
 	// LOCAL
 	if connLocal.IsDocker() {
@@ -81,10 +79,7 @@ func (database *DatabasePostgres) init() {
 	}
 }
 
-func (database *DatabasePostgres) tableFilter(connectionType string) ([]string, []string) {
-	var exclude []string
-	var include []string
-
+func (database *DatabasePostgres) tableFilter(connectionType string) (exclude []string, include []string) {
 	var tableList []string
 
 	if connectionType == "local" {
@@ -115,7 +110,7 @@ func (database *DatabasePostgres) tableFilter(connectionType string) ([]string, 
 		include  = append(include, shell.Quote(fmt.Sprintf("--table=%s", table)))
 	}
 	
-	return exclude, include
+	return
 }
 
 func (database *DatabasePostgres) psqlCommandBuilder(direction string, args ...string) []interface{} {
