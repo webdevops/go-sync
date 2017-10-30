@@ -16,7 +16,7 @@ func (database *DatabasePostgres) init() {
 
 	// LOCAL
 	if connLocal.IsDocker() {
-		if database.Local.User == "" || database.Local.Schema == "" {
+		if database.Local.User == "" || database.Local.Db == "" {
 			containerEnv := connLocal.DockerGetEnvironment()
 
 			// try to guess user/password
@@ -36,11 +36,11 @@ func (database *DatabasePostgres) init() {
 				}
 			}
 
-			// get schema from env
-			if database.Local.Schema == "" {
-				if schema, ok := containerEnv["POSTGRES_DB"]; ok {
-					fmt.Println(fmt.Sprintf("   -> remote: using postgres schema \"%s\" (from env:POSTGRES_DB)", schema))
-					database.Local.Schema = schema
+			// get database from env
+			if database.Local.Db == "" {
+				if db, ok := containerEnv["POSTGRES_DB"]; ok {
+					fmt.Println(fmt.Sprintf("   -> remote: using postgres database \"%s\" (from env:POSTGRES_DB)", db))
+					database.Local.Db = db
 				}
 			}
 		}
@@ -48,7 +48,7 @@ func (database *DatabasePostgres) init() {
 
 	// Remote
 	if connRemote.IsDocker() {
-		if database.User == "" || database.Schema == "" {
+		if database.User == "" || database.Db == "" {
 			containerEnv := connRemote.DockerGetEnvironment()
 
 			// try to guess user/password
@@ -68,11 +68,11 @@ func (database *DatabasePostgres) init() {
 				}
 			}
 
-			// get schema from env
-			if database.Schema == "" {
-				if schema, ok := containerEnv["POSTGRES_DB"]; ok {
-					fmt.Println(fmt.Sprintf("   -> remote: using postgres schema \"%s\" (from env:POSTGRES_DB)", schema))
-					database.Schema = schema
+			// get database from env
+			if database.Db == "" {
+				if db, ok := containerEnv["POSTGRES_DB"]; ok {
+					fmt.Println(fmt.Sprintf("   -> remote: using postgres database \"%s\" (from env:POSTGRES_DB)", db))
+					database.Db = db
 				}
 			}
 		}
@@ -126,7 +126,7 @@ func (database *DatabasePostgres) tableList(connectionType string) []string {
                   FROM information_schema.tables
                  WHERE table_type = 'BASE TABLE'
                    AND table_catalog = %s`
-	sqlStmt = fmt.Sprintf(sqlStmt, database.quote(database.Schema))
+	sqlStmt = fmt.Sprintf(sqlStmt, database.quote(database.Db))
 
 	cmd := shell.Cmd("echo", shell.Quote(sqlStmt)).Pipe(database.psqlCommandBuilder(connectionType)...)
 	output := cmd.Run().Stdout.String()

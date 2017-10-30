@@ -39,7 +39,7 @@ type EnvironmentVar struct {
 
 type Database struct {
 	Type string `yaml:"type"`
-	Schema string `yaml:"schema"`
+	Db string `yaml:"database"`
 	Hostname string `yaml:"hostname"`
 	Port string `yaml:"port"`
 	User string `yaml:"user"`
@@ -51,7 +51,7 @@ type Database struct {
 
 	Local struct {
 		Type string `yaml:"type"`
-		Schema string `yaml:"schema"`
+		Db string `yaml:"database"`
 		Hostname string `yaml:"hostname"`
 		Port string `yaml:"port"`
 		User string `yaml:"user"`

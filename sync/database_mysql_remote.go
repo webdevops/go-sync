@@ -36,8 +36,8 @@ func (database *DatabaseMysql) remoteMysqldumpCmdBuilder(additionalArgs []string
 		args = append(args, excludeArgs...)
 	}
 
-	// schema
-	args = append(args, shell.Quote(database.Schema))
+	// database
+	args = append(args, shell.Quote(database.Db))
 
 	// include
 	if useFilter && len(includeArgs) > 0 {
@@ -78,8 +78,8 @@ func (database *DatabaseMysql) remoteMysqlCmdBuilder(args ...string) []interface
 		args = append(args, shell.Quote("-P" + database.Port))
 	}
 
-	if database.Schema != "" {
-		args = append(args, shell.Quote(database.Schema))
+	if database.Db != "" {
+		args = append(args, shell.Quote(database.Db))
 	}
 
 	// append options in raw
@@ -117,8 +117,8 @@ func (database *DatabaseMysql) remoteMysqlCmdBuilderUncompress(args ...string) [
 		args = append(args, database.Options.Mysql)
 	}
 
-	if database.Schema != "" {
-		args = append(args, shell.Quote(database.Schema))
+	if database.Db != "" {
+		args = append(args, shell.Quote(database.Db))
 	}
 
 	cmd := []string{"gunzip", "--stdout", "|", "mysql", strings.Join(args, " ")}

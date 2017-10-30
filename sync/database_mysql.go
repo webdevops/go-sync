@@ -16,7 +16,7 @@ func (database *DatabaseMysql) init() {
 	
 	// LOCAL
 	if connLocal.IsDocker() {
-		if database.Local.User == "" || database.Local.Schema == "" {
+		if database.Local.User == "" || database.Local.Db == "" {
 			containerEnv := connLocal.DockerGetEnvironment()
 
 			// try to guess user/password
@@ -46,11 +46,11 @@ func (database *DatabaseMysql) init() {
 				}
 			}
 
-			// get schema from env
-			if database.Local.Schema == "" {
-				if schema, ok := containerEnv["MYSQL_DATABASE"]; ok {
-					fmt.Println(fmt.Sprintf("   -> local: using mysql schema \"%s\" (from env:MYSQL_DATABASE)", schema))
-					database.Local.Schema = schema
+			// get database from env
+			if database.Local.Db == "" {
+				if db, ok := containerEnv["MYSQL_DATABASE"]; ok {
+					fmt.Println(fmt.Sprintf("   -> local: using mysql database \"%s\" (from env:MYSQL_DATABASE)", db))
+					database.Local.Db = db
 				}
 			}
 		}
@@ -58,7 +58,7 @@ func (database *DatabaseMysql) init() {
 
 	// Remote
 	if connRemote.IsDocker() {
-		if database.User == "" || database.Schema == "" {
+		if database.User == "" || database.Db == "" {
 			containerEnv := connRemote.DockerGetEnvironment()
 
 			// try to guess user/password
@@ -88,11 +88,11 @@ func (database *DatabaseMysql) init() {
 				}
 			}
 
-			// get schema from env
-			if database.Schema == "" {
-				if schema, ok := containerEnv["MYSQL_DATABASE"]; ok {
-					fmt.Println(fmt.Sprintf("   -> remote: using mysql schema \"%s\" (from env:MYSQL_DATABASE)", schema))
-					database.Schema = schema
+			// get database from env
+			if database.Db == "" {
+				if db, ok := containerEnv["MYSQL_DATABASE"]; ok {
+					fmt.Println(fmt.Sprintf("   -> remote: using mysql database \"%s\" (from env:MYSQL_DATABASE)", db))
+					database.Db = db
 				}
 			}
 		}
@@ -122,7 +122,7 @@ func (database *DatabaseMysql) tableFilter(connectionType string) (exclude []str
 	// calc excludes
 	excludeTableList := database.Filter.CalcExcludes(tableList)
 	for _, table := range excludeTableList {
-		exclude  = append(exclude, shell.Quote(fmt.Sprintf("--ignore-table=%s.%s", database.Schema, table)))
+		exclude  = append(exclude, shell.Quote(fmt.Sprintf("--ignore-table=%s.%s", database.Db, table)))
 	}
 
 	// calc includes

@@ -35,8 +35,8 @@ func (database *DatabasePostgres) remotePgdumpCmdBuilder(additionalArgs []string
 		args = append(args, excludeArgs...)
 	}
 
-	// schema
-	args = append(args, shell.Quote(database.Schema))
+	// database
+	args = append(args, shell.Quote(database.Db))
 
 	// include
 	if useFilter && len(includeArgs) > 0 {
@@ -76,8 +76,8 @@ func (database *DatabasePostgres) remotePsqlCmdBuilder(args ...string) []interfa
 		args = append(args, "-p", shell.Quote(database.Port))
 	}
 
-	if database.Schema != "" {
-		args = append(args, shell.Quote(database.Schema))
+	if database.Db != "" {
+		args = append(args, shell.Quote(database.Db))
 	}
 
 	// append options in raw
@@ -114,8 +114,8 @@ func (database *DatabasePostgres) remotePsqlCmdBuilderUncompress(args ...string)
 		args = append(args, database.Options.Psql)
 	}
 
-	if database.Schema != "" {
-		args = append(args, shell.Quote(database.Schema))
+	if database.Db != "" {
+		args = append(args, shell.Quote(database.Db))
 	}
 
 	cmd := []string{"gunzip", "--stdout", "|", "psql", strings.Join(args, " ")}

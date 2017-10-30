@@ -38,20 +38,20 @@ func (database *Database) Sync() {
 func (database *DatabasePostgres) syncClearDatabase() {
 
 	// don't use database which we're trying to drop, instead use "mysql"
-	schema := database.Local.Schema
-	database.Local.Schema = "postgres"
+	db := database.Local.Db
+	database.Local.Db = "postgres"
 
-	Logger.Step("dropping local database \"%s\"", schema)
-	dropStmt := fmt.Sprintf("DROP DATABASE IF EXISTS `%s`", schema)
+	Logger.Step("dropping local database \"%s\"", db)
+	dropStmt := fmt.Sprintf("DROP DATABASE IF EXISTS `%s`", db)
 	dropCmd := shell.Cmd("echo", shell.Quote(dropStmt)).Pipe(database.localPsqlCmdBuilder()...)
 	dropCmd.Run()
 
-	Logger.Step("creating local database \"%s\"", schema)
-	createStmt := fmt.Sprintf("CREATE DATABASE `%s`", schema)
+	Logger.Step("creating local database \"%s\"", db)
+	createStmt := fmt.Sprintf("CREATE DATABASE `%s`", db)
 	createCmd := shell.Cmd("echo", shell.Quote(createStmt)).Pipe(database.localPsqlCmdBuilder()...)
 	createCmd.Run()
 
-	database.Local.Schema = schema
+	database.Local.Db = db
 }
 
 // Sync database structure
@@ -101,20 +101,20 @@ func (database *DatabasePostgres) syncData() {
 func (database *DatabaseMysql) syncClearDatabase() {
 
 	// don't use database which we're trying to drop, instead use "mysql"
-	schema := database.Local.Schema
-	database.Local.Schema = ""
+	db := database.Local.Db
+	database.Local.Db = ""
 
-	Logger.Step("dropping local database \"%s\"", schema)
-	dropStmt := fmt.Sprintf("DROP DATABASE IF EXISTS `%s`", schema)
+	Logger.Step("dropping local database \"%s\"", db)
+	dropStmt := fmt.Sprintf("DROP DATABASE IF EXISTS `%s`", db)
 	dropCmd := shell.Cmd("echo", shell.Quote(dropStmt)).Pipe(database.localMysqlCmdBuilder()...)
 	dropCmd.Run()
 
-	Logger.Step("creating local database \"%s\"", schema)
-	createStmt := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", schema)
+	Logger.Step("creating local database \"%s\"", db)
+	createStmt := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", db)
 	createCmd := shell.Cmd("echo", shell.Quote(createStmt)).Pipe(database.localMysqlCmdBuilder()...)
 	createCmd.Run()
 
-	database.Local.Schema = schema
+	database.Local.Db = db
 }
 
 // Sync database structure

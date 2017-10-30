@@ -50,7 +50,7 @@ func (database *Database) String(direction string) string {
 
 	//-------------------------------------------
 	// remote
-	remote = append(remote, fmt.Sprintf("Schema:%s", database.Schema))
+	remote = append(remote, fmt.Sprintf("Database:%s", database.Db))
 	remote = append(remote, fmt.Sprintf("Connection:%s", connRemote.GetType()))
 
 	if connRemote.IsSsh() {
@@ -80,7 +80,7 @@ func (database *Database) String(direction string) string {
 
 	//-------------------------------------------
 	// local
-	local = append(local, fmt.Sprintf("Schema:%s", database.Local.Schema))
+	local = append(local, fmt.Sprintf("Database:%s", database.Local.Db))
 	local = append(local, fmt.Sprintf("Connection:%s", connLocal.GetType()))
 
 	if connLocal.IsSsh() {

@@ -26,20 +26,20 @@ func (database *Database) Deploy() {
 func (database *DatabaseMysql) deployClearDatabase() {
 
 	// don't use database which we're trying to drop, instead use "mysql"
-	schema := database.Schema
-	database.Schema = ""
+	db := database.Db
+	database.Db = ""
 
-	Logger.Step("dropping remote database \"%s\"", schema)
-	dropStmt := fmt.Sprintf("DROP DATABASE IF EXISTS `%s`", schema)
+	Logger.Step("dropping remote database \"%s\"", db)
+	dropStmt := fmt.Sprintf("DROP DATABASE IF EXISTS `%s`", db)
 	dropCmd := shell.Cmd("echo", shell.Quote(dropStmt)).Pipe(database.remoteMysqlCmdBuilder()...)
 	dropCmd.Run()
 
-	Logger.Step("creating remote database \"%s\"", schema)
-	createStmt := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", schema)
+	Logger.Step("creating remote database \"%s\"", db)
+	createStmt := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", db)
 	createCmd := shell.Cmd("echo", shell.Quote(createStmt)).Pipe(database.remoteMysqlCmdBuilder()...)
 	createCmd.Run()
 
-	database.Schema = schema
+	database.Db = db
 }
 
 // Deploy database structure

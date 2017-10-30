@@ -40,8 +40,8 @@ func (database *DatabaseMysql) localMysqldumpCmdBuilder(additionalArgs []string,
 		args = append(args, database.Local.Options.Mysqldump)
 	}
 
-	// schema
-	args = append(args, shell.Quote(database.Local.Schema))
+	// database
+	args = append(args, shell.Quote(database.Local.Db))
 
 	// include
 	if useFilter && len(includeArgs) > 0 {
@@ -77,8 +77,8 @@ func (database *DatabaseMysql) localMysqlCmdBuilder(args ...string) []interface{
 		args = append(args, database.Local.Options.Mysql)
 	}
 
-	if database.Local.Schema != "" {
-		args = append(args, shell.Quote(database.Local.Schema))
+	if database.Local.Db != "" {
+		args = append(args, shell.Quote(database.Local.Db))
 	}
 
 	return connection.RawCommandBuilder("mysql", args...)
