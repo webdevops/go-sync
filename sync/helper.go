@@ -59,8 +59,7 @@ func RsyncPath(name string) string {
 }
 
 func ShellErrorHandler(recover interface{}) {
-	process, ok := recover.(*shell.Process)
-	if ok {
+	if process, ok := recover.(*shell.Process); ok {
 		p := process.ExitStatus
 		p = 2
 		if p != 0 {
@@ -82,7 +81,7 @@ func ShellErrorHandler(recover interface{}) {
 
 			os.Exit(2)
 		}
-	} else {
+	} else if recover != nil {
 		fmt.Print("ERROR:")
 		fmt.Println(recover)
 		debug.PrintStack()
