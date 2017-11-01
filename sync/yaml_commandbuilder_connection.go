@@ -1,6 +1,7 @@
 package sync
 
 import (
+	"github.com/mohae/deepcopy"
 	"github.com/webdevops/go-shell/commandbuilder"
 )
 
@@ -53,4 +54,11 @@ func (yconn *YamlCommandBuilderConnection) IsEmpty() (status bool) {
 	if yconn.Environment != nil { return }
 
 	return true
+}
+
+// Clone yaml connection (without shell connection instance)
+func (yconn *YamlCommandBuilderConnection) Clone() (conn *YamlCommandBuilderConnection) {
+	conn = deepcopy.Copy(yconn).(*YamlCommandBuilderConnection)
+	conn.connection = nil
+	return conn
 }

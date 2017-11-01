@@ -8,7 +8,7 @@ import (
 func (filesystem *Filesystem) ApplyDefaults(server *Server) {
 	// set default connection if not set
 	if filesystem.Connection == nil {
-		*filesystem.Connection = *server.Connection
+		filesystem.Connection = server.Connection.Clone()
 	}
 
 	// set default path

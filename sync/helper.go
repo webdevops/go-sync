@@ -7,6 +7,7 @@ import (
 	"strings"
 	"github.com/webdevops/go-shell"
 	"fmt"
+	"runtime/debug"
 )
 
 func CreateTempfile() *os.File {
@@ -81,5 +82,9 @@ func ShellErrorHandler(recover interface{}) {
 
 			os.Exit(2)
 		}
+	} else {
+		fmt.Print("ERROR:")
+		fmt.Println(recover)
+		debug.PrintStack()
 	}
 }

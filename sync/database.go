@@ -8,7 +8,7 @@ import (
 func (database *Database) ApplyDefaults(server *Server) {
 	// set default connection if not set
 	if database.Connection == nil {
-		*database.Connection = *server.Connection
+		database.Connection = server.Connection.Clone()
 	}
 }
 
