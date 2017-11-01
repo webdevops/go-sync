@@ -10,6 +10,11 @@ func (database *Database) ApplyDefaults(server *Server) {
 	if database.Connection == nil {
 		database.Connection = server.Connection.Clone()
 	}
+
+	// default local connection
+	if database.Local.Connection == nil {
+		database.Local.Connection = &YamlCommandBuilderConnection{}
+	}
 }
 
 func (database *Database) GetType() (dbtype string) {
