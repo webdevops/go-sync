@@ -1,10 +1,12 @@
 package sync
 
 import (
+	"os"
 	"fmt"
 	"errors"
-	"os"
+	"strings"
 	"github.com/webdevops/go-shell"
+	"github.com/webdevops/go-shell/commandbuilder"
 )
 
 // General sync
@@ -24,6 +26,10 @@ func (filesystem *Filesystem) deployRsync() {
 	connection := filesystem.Connection.GetInstance()
 
 	args := []string{"-rlptD", "--delete-after", "--progress", "--human-readable"}
+
+	if filesystem.Connection.GetInstance().IsSsh() {
+		args = append(args, "-e", shell.Quote("ssh " + strings.Join(commandbuilder.ConnectionSshArguments, " ")))
+	}
 
 	// include filter
 	if len(filesystem.Filter.Include) > 0 {
