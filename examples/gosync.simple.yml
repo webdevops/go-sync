@@ -1,0 +1,29 @@
+---
+
+sync:
+  production:
+    path: "./local/path/"
+
+    connection:
+      ssh: user@example.com
+
+    filesystem2:
+    - path: /path/to/project/on/example.com/
+      filter:
+        exclude:
+        - .git
+        - node_modules/
+      options:
+        generate-stubs: true
+
+    database:
+    - type: mysql
+      filter:
+        exclude:
+        include:
+      local:
+        schema: app
+        connection:
+          docker: compose:mysql
+      options:
+        clear-database: true
