@@ -18,11 +18,14 @@ sync:
 
     database:
     - type: mysql
+      database: app
+      user: mysql-user
+      password: mysql-password
       filter:
         exclude:
         include:
       local:
-        schema: app
+        database: app
         connection:
           docker: compose:mysql
       options:
