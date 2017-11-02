@@ -57,8 +57,15 @@ func (database *DatabaseMysql) remoteMysqldumpCmdBuilder(additionalArgs []string
 	return connection.RawShellCommandBuilder(cmd...)
 }
 
-func (database *DatabaseMysql) remoteMysqlCmdBuilder(args ...string) []interface{} {
+func (database *DatabaseMysql) remoteMysqlCmdBuilder(additonalArgs ...string) []interface{} {
+	var args []string
+
 	connection := database.Connection.GetInstance().Clone()
+
+	// append options in raw
+	if database.Options.Mysql != "" {
+		args = append(args, database.Options.Mysql)
+	}
 
 	args = append(args, "-BN")
 
@@ -82,17 +89,23 @@ func (database *DatabaseMysql) remoteMysqlCmdBuilder(args ...string) []interface
 		args = append(args, shell.Quote(database.Db))
 	}
 
-	// append options in raw
-	if database.Options.Mysql != "" {
-		args = append(args, database.Options.Mysql)
+	if len(additonalArgs) > 0 {
+		args = append(args, additonalArgs...)
 	}
 
 	return connection.RawCommandBuilder("mysql", args...)
 }
 
 
-func (database *DatabaseMysql) remoteMysqlCmdBuilderUncompress(args ...string) []interface{} {
+func (database *DatabaseMysql) remoteMysqlCmdBuilderUncompress(additonalArgs ...string) []interface{} {
+	var args []string
+
 	connection := database.Connection.GetInstance().Clone()
+
+	// add custom options (raw)
+	if database.Options.Mysql != "" {
+		args = append(args, database.Options.Mysql)
+	}
 
 	args = append(args, "-BN")
 
@@ -112,9 +125,8 @@ func (database *DatabaseMysql) remoteMysqlCmdBuilderUncompress(args ...string) [
 		args = append(args, shell.Quote("-P" + database.Port))
 	}
 
-	// add custom options (raw)
-	if database.Options.Mysql != "" {
-		args = append(args, database.Options.Mysql)
+	if len(additonalArgs) > 0 {
+		args = append(args, additonalArgs...)
 	}
 
 	if database.Db != "" {

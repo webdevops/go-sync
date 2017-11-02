@@ -56,8 +56,16 @@ func (database *DatabasePostgres) remotePgdumpCmdBuilder(additionalArgs []string
 	return connection.RawShellCommandBuilder(cmd...)
 }
 
-func (database *DatabasePostgres) remotePsqlCmdBuilder(args ...string) []interface{} {
+func (database *DatabasePostgres) remotePsqlCmdBuilder(additonalArgs ...string) []interface{} {
+	var args []string
+
 	connection := database.Connection.GetInstance().Clone()
+
+	// append options in raw
+	if database.Options.Psql != "" {
+		args = append(args, database.Options.Psql)
+	}
+
 	args = append(args, "-t")
 
 	if database.User != "" {
@@ -80,9 +88,8 @@ func (database *DatabasePostgres) remotePsqlCmdBuilder(args ...string) []interfa
 		args = append(args, shell.Quote(database.Db))
 	}
 
-	// append options in raw
-	if database.Options.Psql != "" {
-		args = append(args, database.Options.Psql)
+	if len(additonalArgs) > 0 {
+		args = append(args, additonalArgs...)
 	}
 
 	return connection.RawCommandBuilder("psql", args...)

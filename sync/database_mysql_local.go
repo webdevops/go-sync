@@ -9,6 +9,11 @@ func (database *DatabaseMysql) localMysqldumpCmdBuilder(additionalArgs []string,
 
 	connection := database.Local.Connection.GetInstance().Clone()
 
+	// add custom options (raw)
+	if database.Local.Options.Mysqldump != "" {
+		args = append(args, database.Local.Options.Mysqldump)
+	}
+
 	if database.Local.User != "" {
 		args = append(args, shell.Quote("-u" + database.Local.User))
 	}
@@ -35,11 +40,6 @@ func (database *DatabaseMysql) localMysqldumpCmdBuilder(additionalArgs []string,
 		args = append(args, excludeArgs...)
 	}
 
-	// add custom options (raw)
-	if database.Local.Options.Mysqldump != "" {
-		args = append(args, database.Local.Options.Mysqldump)
-	}
-
 	// database
 	args = append(args, shell.Quote(database.Local.Db))
 
@@ -51,8 +51,15 @@ func (database *DatabaseMysql) localMysqldumpCmdBuilder(additionalArgs []string,
 	return connection.RawCommandBuilder("mysqldump", args...)
 }
 
-func (database *DatabaseMysql) localMysqlCmdBuilder(args ...string) []interface{} {
+func (database *DatabaseMysql) localMysqlCmdBuilder(additonalArgs ...string) []interface{} {
+	var args []string
+
 	connection := database.Local.Connection.GetInstance().Clone()
+
+	// add custom options (raw)
+	if database.Local.Options.Mysql != "" {
+		args = append(args, database.Local.Options.Mysql)
+	}
 
 	args = append(args, "-BN")
 
@@ -72,13 +79,12 @@ func (database *DatabaseMysql) localMysqlCmdBuilder(args ...string) []interface{
 		args = append(args, shell.Quote("-P" + database.Local.Port))
 	}
 
-	// add custom options (raw)
-	if database.Local.Options.Mysql != "" {
-		args = append(args, database.Local.Options.Mysql)
-	}
-
 	if database.Local.Db != "" {
 		args = append(args, shell.Quote(database.Local.Db))
+	}
+
+	if len(additonalArgs) > 0 {
+		args = append(args, additonalArgs...)
 	}
 
 	return connection.RawCommandBuilder("mysql", args...)

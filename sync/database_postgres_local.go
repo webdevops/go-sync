@@ -3,8 +3,14 @@ package sync
 import "github.com/webdevops/go-shell"
 
 func (database *DatabasePostgres) localPgdumpCmdBuilder(additionalArgs []string, useFilter bool) []interface{} {
-	connection := database.Local.Connection.GetInstance().Clone()
 	var args []string
+
+	connection := database.Local.Connection.GetInstance().Clone()
+
+	// add custom options (raw)
+	if database.Local.Options.Pgdump != "" {
+		args = append(args, database.Local.Options.Pgdump)
+	}
 
 	if database.Local.User != "" {
 		args = append(args, "-U", shell.Quote(database.Local.User))
@@ -32,11 +38,6 @@ func (database *DatabasePostgres) localPgdumpCmdBuilder(additionalArgs []string,
 		args = append(args, excludeArgs...)
 	}
 
-	// add custom options (raw)
-	if database.Local.Options.Pgdump != "" {
-		args = append(args, database.Local.Options.Pgdump)
-	}
-
 	// database
 	args = append(args, shell.Quote(database.Local.Db))
 
@@ -48,8 +49,16 @@ func (database *DatabasePostgres) localPgdumpCmdBuilder(additionalArgs []string,
 	return connection.RawCommandBuilder("pg_dump", args...)
 }
 
-func (database *DatabasePostgres) localPsqlCmdBuilder(args ...string) []interface{} {
+func (database *DatabasePostgres) localPsqlCmdBuilder(additonalArgs ...string) []interface{} {
+	var args []string
+
 	connection := database.Local.Connection.GetInstance().Clone()
+
+	// add custom options (raw)
+	if database.Local.Options.Psql != "" {
+		args = append(args, database.Local.Options.Psql)
+	}
+
 	args = append(args, "-t")
 
 	if database.Local.User != "" {
@@ -68,9 +77,8 @@ func (database *DatabasePostgres) localPsqlCmdBuilder(args ...string) []interfac
 		args = append(args, "-p", shell.Quote(database.Local.Port))
 	}
 
-	// add custom options (raw)
-	if database.Local.Options.Psql != "" {
-		args = append(args, database.Local.Options.Psql)
+	if len(additonalArgs) > 0 {
+		args = append(args, additonalArgs...)
 	}
 
 	if database.Local.Db != "" {
