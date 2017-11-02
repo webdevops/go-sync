@@ -15,20 +15,21 @@ Features
 
 General:
 - Yaml based configuration files (`gosync.yml` or `.gosync.yml`)
-- Automatic cleanup of schemas before restore
+- PostgreSQL and MySQL support
+- SSH and Docker support (with docker-compose support)
 
 Sync:
 - Filesync (rsync) from remote servers using SSH
 - Create file stubs instead of fetching files from remote (with real images, see ``options.generate-stubs = true``)
-- Dump MySQL schemas from remote servers using SSH, Docker and SSH+Docker
-- Restore MySQL schema to local MySQL servers or Docker/Docker-Compose containers
+- Dump databases from remote servers using SSH, Docker and SSH+Docker
+- Restore databases to local database servers or Docker/Docker-Compose containers
 - Filtering databases tabes with regexp
 - Rsync filters
 - Custom exec scripts (startup/finish) on local or remote machine (using SSH)
 
 Deployment:
 - Filesync (rsync) from local to remote servers using SSH
-- Dump MySQL schemas from local MySQL servers or Docker/Docker-Compose containers
+- Dump databases from local database servers or Docker/Docker-Compose containers
 - Filtering databases tabes with regexp
 - Rsync filters
 - Custom exec scripts (startup/finish) on local or remote machine (using SSH)
