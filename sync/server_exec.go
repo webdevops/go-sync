@@ -8,6 +8,8 @@ func (server *Server) RunExec(when string) {
 		ShellErrorHandler(recover)
 	}()
 
+	server.Init()
+
 	execList := server.GetExecByWhen(when)
 
 	if len(execList) >= 1 {

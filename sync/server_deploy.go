@@ -6,10 +6,23 @@ func (server *Server) Deploy() {
 		ShellErrorHandler(recover)
 	}()
 
-	server.RunExec("startup")
-	server.DeployFilesystem()
-	server.DeployDatabases()
-	server.RunExec("finish")
+	server.Init()
+
+	if server.runConfiguration.Exec {
+		server.RunExec("startup")
+	}
+
+	if server.runConfiguration.Filesystem {
+		server.DeployFilesystem()
+	}
+
+	if server.runConfiguration.Database {
+		server.DeployDatabases()
+	}
+
+	if server.runConfiguration.Exec {
+		server.RunExec("finish")
+	}
 
 	waitGroup.Wait()
 }

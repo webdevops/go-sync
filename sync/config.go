@@ -82,9 +82,17 @@ type Server struct {
 	Database []Database `yaml:"database"`
 	ExecStartup []Execution `yaml:"exec-startup"`
 	ExecFinish []Execution `yaml:"exec-finish"`
+
+	runConfiguration *RunConfiguration
 }
 
 type SyncConfig struct {
 	Sync map[string]Server `yaml:"sync"`
 	Deploy map[string]Server `yaml:"deploy"`
+}
+
+type RunConfiguration struct {
+	Database   bool
+	Filesystem bool
+	Exec       bool
 }

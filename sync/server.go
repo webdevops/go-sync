@@ -1,6 +1,17 @@
 package sync
 
-import "gopkg.in/yaml.v2"
+import (
+	"gopkg.in/yaml.v2"
+)
+
+func (server *Server) Init() {
+	if server.runConfiguration == nil {
+		server.runConfiguration = &RunConfiguration{
+			Database: true,
+			Filesystem: true,
+		}
+	}
+}
 
 func (server *Server) GetLocalPath() string {
 	if server.Path == "" {
@@ -8,6 +19,10 @@ func (server *Server) GetLocalPath() string {
 	}
 
 	return server.Path
+}
+
+func (server *Server) SetRunConfiguration(conf RunConfiguration) {
+	server.runConfiguration = &conf
 }
 
 func (server *Server) AsYaml() string {
