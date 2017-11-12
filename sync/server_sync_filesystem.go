@@ -27,6 +27,11 @@ func (filesystem *Filesystem) syncRsync() {
 
 	args := []string{"-rlptD", "--delete-after", "--progress", "--human-readable"}
 
+	// add custom options
+	if filesystem.Options.Rsync != nil {
+		args = append(args, filesystem.Options.Rsync.Array()...)
+	}
+
 	if filesystem.Connection.GetInstance().IsSsh() {
 		args = append(args, "-e", shell.Quote("ssh " + strings.Join(commandbuilder.ConnectionSshArguments, " ")))
 	}

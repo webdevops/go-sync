@@ -41,10 +41,7 @@ type Filesystem struct {
 	Filter Filter `yaml:"filter"`
 	// Connection for filesystem sync (optional, default is Server connection)
 	Connection *YamlCommandBuilderConnection `yaml:"connection"`
-	Options struct {
-		// Generate stubs (small example files) instead of fetching files from remote
-		GenerateStubs bool `yaml:"generate-stubs"`
-	} `yaml:"options"`
+	Options FilesystemOptions `yaml:"options"`
 }
 
 type Database struct {
@@ -132,6 +129,13 @@ type DatabaseOptions struct {
 	Pgdump *YamlStringArray `yaml:"pgdump"`
 	// Arguments for psql command
 	Psql *YamlStringArray `yaml:"psql"`
+}
+
+type FilesystemOptions struct {
+	// Generate stubs (small example files) instead of fetching files from remote
+	GenerateStubs bool `yaml:"generate-stubs"`
+	// Arguments for psql command
+	Rsync *YamlStringArray `yaml:"rsync"`
 }
 
 type EnvironmentVar struct {
