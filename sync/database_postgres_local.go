@@ -8,8 +8,8 @@ func (database *DatabasePostgres) localPgdumpCmdBuilder(additionalArgs []string,
 	connection := database.Local.Connection.GetInstance().Clone()
 
 	// add custom options (raw)
-	if database.Local.Options.Pgdump != "" {
-		args = append(args, database.Local.Options.Pgdump)
+	if database.Local.Options.Pgdump != nil {
+		args = append(args, database.Local.Options.Pgdump.Array()...)
 	}
 
 	if database.Local.User != "" {
@@ -55,8 +55,8 @@ func (database *DatabasePostgres) localPsqlCmdBuilder(additonalArgs ...string) [
 	connection := database.Local.Connection.GetInstance().Clone()
 
 	// add custom options (raw)
-	if database.Local.Options.Psql != "" {
-		args = append(args, database.Local.Options.Psql)
+	if database.Local.Options.Psql != nil {
+		args = append(args, database.Local.Options.Psql.Array()...)
 	}
 
 	args = append(args, "-t")

@@ -47,8 +47,8 @@ func (database *DatabaseMysql) remoteMysqldumpCmdBuilder(additionalArgs []string
 	cmd := []string{"mysqldump"}
 
 	// add custom options (raw)
-	if database.Options.Mysqldump != "" {
-		cmd = append(cmd, database.Options.Mysqldump)
+	if database.Options.Mysqldump != nil {
+		cmd = append(cmd, database.Options.Mysqldump.Array()...)
 	}
 
 	cmd = append(cmd, args...)
@@ -63,8 +63,8 @@ func (database *DatabaseMysql) remoteMysqlCmdBuilder(additonalArgs ...string) []
 	connection := database.Connection.GetInstance().Clone()
 
 	// append options in raw
-	if database.Options.Mysql != "" {
-		args = append(args, database.Options.Mysql)
+	if database.Options.Mysql != nil {
+		args = append(args, database.Options.Mysql.Array()...)
 	}
 
 	args = append(args, "-BN")
@@ -103,8 +103,8 @@ func (database *DatabaseMysql) remoteMysqlCmdBuilderUncompress(additonalArgs ...
 	connection := database.Connection.GetInstance().Clone()
 
 	// add custom options (raw)
-	if database.Options.Mysql != "" {
-		args = append(args, database.Options.Mysql)
+	if database.Options.Mysql != nil {
+		args = append(args, database.Options.Mysql.Array()...)
 	}
 
 	args = append(args, "-BN")

@@ -46,8 +46,8 @@ func (database *DatabasePostgres) remotePgdumpCmdBuilder(additionalArgs []string
 	cmd := []string{"pg_dump"}
 
 	// add custom options (raw)
-	if database.Options.Pgdump != "" {
-		cmd = append(cmd, database.Options.Pgdump)
+	if database.Options.Pgdump != nil {
+		cmd = append(cmd, database.Options.Pgdump.Array()...)
 	}
 
 	cmd = append(cmd, args...)
@@ -62,8 +62,8 @@ func (database *DatabasePostgres) remotePsqlCmdBuilder(additonalArgs ...string) 
 	connection := database.Connection.GetInstance().Clone()
 
 	// append options in raw
-	if database.Options.Psql != "" {
-		args = append(args, database.Options.Psql)
+	if database.Options.Psql != nil {
+		args = append(args, database.Options.Psql.Array()...)
 	}
 
 	args = append(args, "-t")
@@ -117,8 +117,8 @@ func (database *DatabasePostgres) remotePsqlCmdBuilderUncompress(args ...string)
 	}
 
 	// add custom options (raw)
-	if database.Options.Psql != "" {
-		args = append(args, database.Options.Psql)
+	if database.Options.Psql != nil {
+		args = append(args, database.Options.Psql.Array()...)
 	}
 
 	if database.Db != "" {

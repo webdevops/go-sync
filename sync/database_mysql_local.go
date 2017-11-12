@@ -10,8 +10,8 @@ func (database *DatabaseMysql) localMysqldumpCmdBuilder(additionalArgs []string,
 	connection := database.Local.Connection.GetInstance().Clone()
 
 	// add custom options (raw)
-	if database.Local.Options.Mysqldump != "" {
-		args = append(args, database.Local.Options.Mysqldump)
+	if database.Local.Options.Mysqldump != nil {
+		args = append(args, database.Local.Options.Mysqldump.Array()...)
 	}
 
 	if database.Local.User != "" {
@@ -57,8 +57,8 @@ func (database *DatabaseMysql) localMysqlCmdBuilder(additonalArgs ...string) []i
 	connection := database.Local.Connection.GetInstance().Clone()
 
 	// add custom options (raw)
-	if database.Local.Options.Mysql != "" {
-		args = append(args, database.Local.Options.Mysql)
+	if database.Local.Options.Mysql != nil {
+		args = append(args, database.Local.Options.Mysql.Array()...)
 	}
 
 	args = append(args, "-BN")
