@@ -7,16 +7,29 @@ import (
 
 var waitGroup sync.WaitGroup
 
-type Filter struct {
-	// Exclude as strings (regexp)
-	Exclude []string `yaml:"exclude"`
-	// compiled regexp excludes
-	excludeRegexp []*regexp.Regexp
+type SyncConfig struct {
+	// Sync (remote -> local) configurations
+	Sync map[string]Server `yaml:"sync"`
+	// Deploy (local -> remote) configurations
+	Deploy map[string]Server `yaml:"deploy"`
+}
 
-	// Includes as strings (regexp)
-	Include []string `yaml:"include"`
-	// compiled regexp includes
-	includeRegexp []*regexp.Regexp
+type Server struct {
+	// General working path (for filesystem syncs)
+	Path string `yaml:"path"`
+	// General connection (default for all remote connections)
+	Connection *YamlCommandBuilderConnection `yaml:"connection"`
+	// Filesystem sync list
+	Filesystem []Filesystem `yaml:"filesystem"`
+	// Database sync list
+	Database []Database `yaml:"database"`
+	// Startup execution list (executed before sync)
+	ExecStartup []Execution `yaml:"exec-startup"`
+	// Finish execution list (executed after sync)
+	ExecFinish []Execution `yaml:"exec-finish"`
+
+	// Runtime configuration (not part of configuration)
+	runConfiguration *RunConfiguration
 }
 
 type Filesystem struct {
@@ -32,26 +45,6 @@ type Filesystem struct {
 		// Generate stubs (small example files) instead of fetching files from remote
 		GenerateStubs bool `yaml:"generate-stubs"`
 	} `yaml:"options"`
-}
-
-type DatabaseOptions struct {
-	// Clear database with DROP/CREATE before sync
-	ClearDatabase bool `yaml:"clear-database"`
-	// Arguments for mysqldump command
-	Mysqldump *YamlStringArray `yaml:"mysqldump"`
-	// Arguments for mysql command
-	Mysql *YamlStringArray `yaml:"mysql"`
-	// Arguments for pgdump command
-	Pgdump *YamlStringArray `yaml:"pgdump"`
-	// Arguments for psql command
-	Psql *YamlStringArray `yaml:"psql"`
-}
-
-type EnvironmentVar struct {
-	// Name of variable
-	Name string `yaml:"name"`
-	// Value of variable
-	Value string `yaml:"value"`
 }
 
 type Database struct {
@@ -116,28 +109,36 @@ type Execution struct {
 	} `yaml:"options"`
 }
 
-type Server struct {
-	// General working path (for filesystem syncs)
-	Path string `yaml:"path"`
-	// General connection (default for all remote connections)
-	Connection *YamlCommandBuilderConnection `yaml:"connection"`
-	// Filesystem sync list
-	Filesystem []Filesystem `yaml:"filesystem"`
-	// Database sync list
-	Database []Database `yaml:"database"`
-	// Startup execution list (executed before sync)
-	ExecStartup []Execution `yaml:"exec-startup"`
-	// Finish execution list (executed after sync)
-	ExecFinish []Execution `yaml:"exec-finish"`
+type Filter struct {
+	// Exclude as strings (regexp)
+	Exclude []string `yaml:"exclude"`
+	// compiled regexp excludes
+	excludeRegexp []*regexp.Regexp
 
-	runConfiguration *RunConfiguration
+	// Includes as strings (regexp)
+	Include []string `yaml:"include"`
+	// compiled regexp includes
+	includeRegexp []*regexp.Regexp
 }
 
-type SyncConfig struct {
-	// Sync (remote -> local) configurations
-	Sync map[string]Server `yaml:"sync"`
-	// Deploy (local -> remote) configurations
-	Deploy map[string]Server `yaml:"deploy"`
+type DatabaseOptions struct {
+	// Clear database with DROP/CREATE before sync
+	ClearDatabase bool `yaml:"clear-database"`
+	// Arguments for mysqldump command
+	Mysqldump *YamlStringArray `yaml:"mysqldump"`
+	// Arguments for mysql command
+	Mysql *YamlStringArray `yaml:"mysql"`
+	// Arguments for pgdump command
+	Pgdump *YamlStringArray `yaml:"pgdump"`
+	// Arguments for psql command
+	Psql *YamlStringArray `yaml:"psql"`
+}
+
+type EnvironmentVar struct {
+	// Name of variable
+	Name string `yaml:"name"`
+	// Value of variable
+	Value string `yaml:"value"`
 }
 
 type RunConfiguration struct {
