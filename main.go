@@ -14,7 +14,7 @@ const (
 	// application informations
 	Name    = "gosync"
 	Author  = "webdevops.io"
-	Version = "0.5.3"
+	Version = "0.5.4"
 
 	// self update informations
 	GithubOrganization  = "webdevops"
