@@ -70,6 +70,15 @@ Available commands:
 
 ```
 
+Configuration (gosync.yml)
+==========================
+
+Gosync is controlled by `gosync.yml` (or `.gosync.yml`) which will be
+searched in current and parent directories.
+
+* [Simple gosync.yml](examples/gosync.simple.yml)
+* [Full gosync.yml](examples/gosync.yml)
+
 Example
 =======
 
