@@ -31,11 +31,20 @@ sync:
         - .git
         - node_modules/
 
-    ## Create file stubs for /tmp/remote/other/path to ./other/
+    ## Create file stubs for /tmp/remote/other/path-big-files to ./other-stubs/
     - path: /tmp/remote/other/path-big-files
       local: ./other-stubs/
       options:
         generate-stubs: true
+        rsync:
+        - "--iconv=UTF8-MAC,UTF8"
+
+    ## Sync /tmp/remote/other/path-other-files to ./other2/ with custom rsync options
+    - path: /tmp/remote/other/path-other-files
+      local: ./other2/
+      options:
+        rsync:
+        - "--iconv=UTF8-MAC,UTF8"
 
     #########################
     ## Database
