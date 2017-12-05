@@ -23,7 +23,7 @@ Sync:
 - Create file stubs instead of fetching files from remote (with real images, see ``options.generate-stubs = true``)
 - Dump databases from remote servers using SSH, Docker and SSH+Docker
 - Restore databases to local database servers or Docker/Docker-Compose containers
-- Filtering databases tabes with regexp
+- Filtering databases tables with regexp
 - Rsync filters
 - Custom exec scripts (startup/finish) on local or remote machine (using SSH)
 
