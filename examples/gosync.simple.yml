@@ -7,7 +7,7 @@ sync:
     connection:
       ssh: user@example.com
 
-    filesystem2:
+    filesystem:
     - path: /path/to/project/on/example.com/
       filter:
         exclude:
