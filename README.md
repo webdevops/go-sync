@@ -30,7 +30,7 @@ Sync:
 Deployment:
 - Filesync (rsync) from local to remote servers using SSH
 - Dump databases from local database servers or Docker/Docker-Compose containers
-- Filtering databases tabes with regexp
+- Filtering databases tables with regexp
 - Rsync filters
 - Custom exec scripts (startup/finish) on local or remote machine (using SSH)
 
