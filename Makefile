@@ -11,7 +11,7 @@ ALL = \
 
 all: test build
 
-build: clean test $(ALL)
+build: clean module test $(ALL)
 
 # cram is a python app, so 'easy_install/pip install cram' to run tests
 test:
@@ -20,6 +20,9 @@ test:
 
 clean:
 	rm -f $(ALL)
+
+module:
+	go mod vendor
 
 # os is determined as thus: if variable of suffix exists, it's taken, if not, then
 # suffix itself is taken

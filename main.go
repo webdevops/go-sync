@@ -7,7 +7,7 @@ import (
 	"runtime/debug"
 	flags "github.com/jessevdk/go-flags"
 	"github.com/webdevops/go-shell"
-	"./logger"
+	"github.com/webdevops/go-sync/logger"
 )
 
 const (

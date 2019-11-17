@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"./sync"
+	"github.com/webdevops/go-sync/sync"
 )
 
 type SyncCommand struct {

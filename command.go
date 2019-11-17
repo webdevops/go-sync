@@ -5,9 +5,8 @@ import (
 	"os"
 	"fmt"
 	"path"
-	"./sync"
+	"github.com/webdevops/go-sync/sync"
 	"gopkg.in/AlecAivazis/survey.v1"
-
 )
 
 type AbstractCommand struct {
