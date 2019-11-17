@@ -128,7 +128,7 @@ func (database *DatabaseMysql) syncStructure() {
 	defer os.Remove(tmpfile.Name())
 
 	// Sync structure only
-	dumpCmd := database.remoteMysqldumpCmdBuilder([]string{"--no-data"}, false)
+	dumpCmd := database.remoteMysqldumpCmdBuilder([]string{"--no-data"}, true)
 	shell.Cmd(dumpCmd...).Pipe("cat", ">", tmpfile.Name()).Run()
 
 	// Restore structure only
@@ -147,7 +147,7 @@ func (database *DatabaseMysql) syncData() {
 	defer os.Remove(tmpfile.Name())
 
 	// Sync data only
-	dumpCmd := database.remoteMysqldumpCmdBuilder([]string{"--no-create-info"}, false)
+	dumpCmd := database.remoteMysqldumpCmdBuilder([]string{"--no-create-info"}, true)
 	shell.Cmd(dumpCmd...).Pipe("cat", ">", tmpfile.Name()).Run()
 
 	// Restore data only
