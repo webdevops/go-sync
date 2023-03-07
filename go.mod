@@ -11,7 +11,7 @@ require (
 	github.com/remeh/sizedwaitgroup v1.0.0
 	github.com/webdevops/go-shell v0.0.0-20171102182145-aac7e8b74cc8
 	github.com/webdevops/go-stubfilegenerator v0.0.0-20171011222655-fb60bac44836
-	golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8 // indirect
+	golang.org/x/image v0.5.0 // indirect
 	gopkg.in/AlecAivazis/survey.v1 v1.8.7
 	gopkg.in/yaml.v2 v2.2.5
 )
